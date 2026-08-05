@@ -106,7 +106,7 @@ export default function ChatPage() {
       );
 
       alert(res.data.message);
-    } catch (err: any) {
+    } catch (err) {
       alert(
         err.response?.data?.message ||
           "Something went wrong"
@@ -170,7 +170,7 @@ export default function ChatPage() {
               </p>
             </div>
           ) : (
-            messages.map((msg: any, index) => {
+           messages.map((msg, index) => {
               const isMe =
                 msg.sender?._id === sender ||
                 msg.sender === sender;
