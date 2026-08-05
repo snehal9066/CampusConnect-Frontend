@@ -111,7 +111,7 @@ export default function ProfilePage() {
     alert(res.data.message);
 
     localStorage.setItem("user", JSON.stringify(res.data.user));
-  } } catch (err: any) {
+   } catch (err: any) {
   console.log(err);
 
   if (err.response) {
