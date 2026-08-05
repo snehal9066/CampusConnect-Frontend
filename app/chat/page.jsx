@@ -170,50 +170,68 @@ export default function ChatPage() {
               </p>
             </div>
           ) : (
-           messages.map((msg, index) => {
-              const isMe =
-                msg.sender?._id === sender ||
-                msg.sender === sender;
+   messages.map((msg, index) => {
+  const isMe =
+    msg.sender?._id === sender ||
+    msg.sender === sender; 
 
-              return (
-                <div
-                  key={index}
-                  className={`flex ${
-                    isMe
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[75%] rounded-3xl px-5 py-4 shadow-lg transition-all ${
-                      isMe
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                        : "bg-white border border-gray-200"
-                    }`}
-                  >
-                    <p className="text-xs opacity-70 mb-2 font-semibold">
-                      {isMe ? "You" : "🎭 Anonymous"}
-                    </p>
+  return (
+    <div
+      key={index}
+      className={`flex ${
+        isMe ? "justify-end" : "justify-start"
+      }`}
+    >
+      <div
+        className={`max-w-[75%] rounded-3xl px-5 py-4 shadow-lg transition-all ${
+          isMe
+            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+            : "bg-slate-200 border border-slate-300 text-slate-900"
+        }`}
+      >
+        <p
+          className={`text-xs mb-2 font-semibold ${
+            isMe
+              ? "text-white/70"
+              : "text-slate-600"
+          }`}
+        >
+          {isMe ? "You" : "🎭 Anonymous"}
+        </p>
 
-                    <p className="text-base break-words">
-                      {msg.text}
-                    </p>
+        <p
+          className={`text-base break-words ${
+            isMe
+              ? "text-white"
+              : "text-slate-900"
+          }`}
+        >
+          {msg.text}
+        </p>
 
-                    <div className="flex justify-end mt-2">
-                      <p className="text-[11px] opacity-70">
-                        {new Date(
-                          msg.createdAt
-                        ).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
+        <div className="flex justify-end mt-2">
+          <p
+            className={`text-[11px] ${
+              isMe
+                ? "text-white/70"
+                : "text-slate-500"
+            }`}
+          >
+            {new Date(msg.createdAt).toLocaleTimeString(
+              [],
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+})
+          )
+}
 
           {typing && (
             <p className="text-gray-500 italic">
@@ -224,7 +242,7 @@ export default function ChatPage() {
           <div ref={bottomRef}></div>
         </div>
 
-        <div className="border-t border-white/10 bg-white px-5 py-4">
+       <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-50 via-blue-50 to-slate-100 p-6 space-y-4">
           <div className="flex items-center gap-3">
 
             <button
