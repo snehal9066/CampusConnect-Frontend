@@ -26,21 +26,24 @@ export default function ProfilePage() {
   });
 
   const [image, setImage] = useState<File | null>(null);
+  const [profileImage, setProfileImage] = useState("");
 
-  useEffect(() => {
+ useEffect(() => {
   const loadProfile = async () => {
-    const savedUser = localStorage.getItem("user");
-
-    if (!savedUser) return;
-
-    const user = JSON.parse(savedUser);
-
     try {
+      const savedUser = localStorage.getItem("user");
+
+      if (!savedUser) return;
+
+      const user = JSON.parse(savedUser);
+
       const res = await axios.get(
         `${API_URL}/api/profile/${user.username}`
       );
 
       const profile = res.data;
+
+      setProfileImage(profile.profileImage || "");
 
       setForm({
         username: profile.username || "",
@@ -49,14 +52,14 @@ export default function ProfilePage() {
         gender: profile.gender || "Male",
         interestedIn: profile.interestedIn || "Female",
         location: profile.location || "",
-        interests: profile.interests
+        interests: Array.isArray(profile.interests)
           ? profile.interests.join(", ")
           : "",
       });
 
       localStorage.setItem("user", JSON.stringify(profile));
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -98,6 +101,7 @@ export default function ProfilePage() {
         }
       );
 
+      setProfileImage(res.data.user.profileImage);
       alert(res.data.message);
     } catch (err: any) {
       alert(err.response?.data?.message || "Upload Failed");
@@ -185,22 +189,22 @@ export default function ProfilePage() {
           <div className="-mt-20 flex flex-col items-center">
 
             {image ? (
-
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Profile"
-                className="w-40 h-40 rounded-full border-4 border-white object-cover shadow-xl"
-              />
-
-            ) : (
-
-              <div className="w-40 h-40 rounded-full bg-slate-700 border-4 border-white flex items-center justify-center text-7xl shadow-xl">
-
-                👤
-
-              </div>
-
-            )}
+  <img
+    src={URL.createObjectURL(image)}
+    alt="Profile"
+    className="w-40 h-40 rounded-full border-4 border-white object-cover shadow-xl"
+  />
+) : profileImage ? (
+  <img
+    src={profileImage}
+    alt="Profile"
+    className="w-40 h-40 rounded-full border-4 border-white object-cover shadow-xl"
+  />
+) : (
+  <div className="w-40 h-40 rounded-full bg-slate-700 border-4 border-white flex items-center justify-center text-7xl shadow-xl">
+    👤
+  </div>
+)}
 
             <h1 className="mt-5 text-4xl font-bold text-white">
               {form.username}
