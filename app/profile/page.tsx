@@ -28,17 +28,40 @@ export default function ProfilePage() {
   const [image, setImage] = useState<File | null>(null);
 
   useEffect(() => {
+  const loadProfile = async () => {
     const savedUser = localStorage.getItem("user");
 
-    if (savedUser) {
-      const user = JSON.parse(savedUser);
+    if (!savedUser) return;
 
-      setForm((prev) => ({
-        ...prev,
-        username: user.username || "",
-      }));
+    const user = JSON.parse(savedUser);
+
+    try {
+      const res = await axios.get(
+        `${API_URL}/api/profile/${user.username}`
+      );
+
+      const profile = res.data;
+
+      setForm({
+        username: profile.username || "",
+        bio: profile.bio || "",
+        age: profile.age ? String(profile.age) : "",
+        gender: profile.gender || "Male",
+        interestedIn: profile.interestedIn || "Female",
+        location: profile.location || "",
+        interests: profile.interests
+          ? profile.interests.join(", ")
+          : "",
+      });
+
+      localStorage.setItem("user", JSON.stringify(profile));
+    } catch (err) {
+      console.log(err);
     }
-  }, []);
+  };
+
+  loadProfile();
+}, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -111,7 +134,18 @@ export default function ProfilePage() {
     alert(res.data.message);
 
     localStorage.setItem("user", JSON.stringify(res.data.user));
-   } catch (err: any) {
+   setForm({
+  username: res.data.user.username || "",
+  bio: res.data.user.bio || "",
+  age: res.data.user.age ? String(res.data.user.age) : "",
+  gender: res.data.user.gender || "Male",
+  interestedIn: res.data.user.interestedIn || "Female",
+  location: res.data.user.location || "",
+  interests: res.data.user.interests
+    ? res.data.user.interests.join(", ")
+    : "",
+});
+  } catch (err: any) {
   console.log(err);
 
   if (err.response) {
