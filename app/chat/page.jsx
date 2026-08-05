@@ -253,17 +253,17 @@ export default function ChatPage() {
             </button>
 
             <input
-              type="text"
-              placeholder="Type your message..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-              className="flex-1 rounded-full border border-slate-300 px-6 py-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300"
-            />
+  type="text"
+  placeholder="Type your message..."
+  value={text}
+  onChange={(e) => setText(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  }}
+  className="flex-1 rounded-full border border-slate-300 bg-white text-slate-900 placeholder:text-slate-500 px-6 py-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300"
+/>
 
             <button
               className="text-2xl hover:scale-110 transition"
