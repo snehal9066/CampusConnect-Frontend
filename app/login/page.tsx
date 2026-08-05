@@ -11,33 +11,40 @@ export default function LoginPage() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     try {
       setLoading(true);
 
       const res = await axios.post(
-  "http://localhost:5000/api/auth/login",
-  {
-    username,
-    password,
-  }
-);
+        `${API_URL}/api/auth/login`,
+        {
+          username,
+          password,
+        }
+      );
 
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
 
       router.push("/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login Failed");
+    } catch (err: any) {
+      alert(
+        err?.response?.data?.message ||
+          "Login Failed"
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -74,6 +81,7 @@ export default function LoginPage() {
               setUsername(e.target.value)
             }
             className="w-full rounded-xl bg-slate-800/70 p-4 text-white outline-none focus:ring-2 focus:ring-blue-500"
+            required
           />
 
           <div className="relative">
@@ -90,6 +98,7 @@ export default function LoginPage() {
                 setPassword(e.target.value)
               }
               className="w-full rounded-xl bg-slate-800/70 p-4 text-white outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
 
             <button
@@ -105,10 +114,13 @@ export default function LoginPage() {
           </div>
 
           <button
+            type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 py-4 font-semibold text-white transition hover:scale-105"
+            className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 py-4 font-semibold text-white transition hover:scale-105 disabled:opacity-50"
           >
-            {loading ? "Logging in..." : "🚀 Login"}
+            {loading
+              ? "Logging in..."
+              : "🚀 Login"}
           </button>
 
         </form>
