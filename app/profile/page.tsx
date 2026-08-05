@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../services/api";
 
 interface ProfileForm {
   username: string;
@@ -65,7 +66,7 @@ export default function ProfilePage() {
       formData.append("image", image);
 
       const res = await axios.post(
-        "http://localhost:5000/api/profile/upload-profile-picture",
+  `${API_URL}/api/profile/upload-profile-picture`,
         formData,
         {
           headers: {

@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { socket } from "../../services/socket";
+import API_URL from "../../services/api";
 
 export default function ChatPage() {
-
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [connected, setConnected] = useState(false);
@@ -40,7 +40,7 @@ export default function ChatPage() {
     const loadMessages = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/messages/${matchId}`
+          `${API_URL}/api/messages/${matchId}`
         );
 
         setMessages(res.data);
@@ -94,19 +94,19 @@ export default function ChatPage() {
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-  "http://172.20.10.6:5000/api/match/reveal",
-  {
-    matchId,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+        `${API_URL}/api/match/reveal`,
+        {
+          matchId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       alert(res.data.message);
-    } catch (err) {
+    } catch (err: any) {
       alert(
         err.response?.data?.message ||
           "Something went wrong"
@@ -125,186 +125,146 @@ export default function ChatPage() {
 
     setText("");
   };
+
   return (
-  <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center p-5">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-purple-950 flex items-center justify-center p-5">
+      <div className="w-full max-w-5xl h-[90vh] rounded-3xl overflow-hidden bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col">
 
-    <div className="w-full max-w-5xl h-[90vh] rounded-3xl overflow-hidden bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col">
-
-      {/* ================= HEADER ================= */}
-
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-5 flex items-center justify-between">
-
-        <div className="flex items-center gap-4">
-
-          <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center text-3xl shadow-lg">
-            🎭
-          </div>
-
-          <div>
-
-            <h1 className="text-2xl font-bold">
-              {partner.username || "Anonymous Partner"}
-            </h1>
-
-            <p className="text-sm text-blue-100">
-              {connected ? "🟢 Online" : "🔴 Offline"}
-            </p>
-
-          </div>
-
-        </div>
-
-        <button
-          onClick={revealIdentity}
-          className="rounded-xl bg-green-500 px-5 py-3 font-semibold hover:bg-green-600 transition"
-        >
-          👤 Reveal Identity
-        </button>
-
-      </div>
-
-      {/* ================= CHAT AREA ================= */}
-
-      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-100 to-white p-6 space-y-4">
-
-        {messages.length === 0 ? (
-
-          <div className="h-full flex flex-col justify-center items-center">
-
-            <div className="text-8xl mb-5">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center text-3xl shadow-lg">
               🎭
             </div>
 
-            <h2 className="text-3xl font-bold text-slate-700">
-              Anonymous Chat
-            </h2>
+            <div>
+              <h1 className="text-2xl font-bold">
+                {partner.username || "Anonymous Partner"}
+              </h1>
 
-            <p className="text-gray-500 mt-3">
-              Say hello and start your first conversation.
-            </p>
-
+              <p className="text-sm text-blue-100">
+                {connected ? "🟢 Online" : "🔴 Offline"}
+              </p>
+            </div>
           </div>
 
-        ) : (
+          <button
+            onClick={revealIdentity}
+            className="rounded-xl bg-green-500 px-5 py-3 font-semibold hover:bg-green-600 transition"
+          >
+            👤 Reveal Identity
+          </button>
+        </div>
 
-          messages.map((msg, index) => {
+        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-100 to-white p-6 space-y-4">
 
-           const isMe =
-  msg.sender?._id === sender || msg.sender === sender;
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col justify-center items-center">
+              <div className="text-8xl mb-5">🎭</div>
 
-            return (
+              <h2 className="text-3xl font-bold text-slate-700">
+                Anonymous Chat
+              </h2>
 
-              <div
-                key={index}
-                className={`flex ${
-                  isMe
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
+              <p className="text-gray-500 mt-3">
+                Say hello and start your first conversation.
+              </p>
+            </div>
+          ) : (
+            messages.map((msg: any, index) => {
+              const isMe =
+                msg.sender?._id === sender ||
+                msg.sender === sender;
 
+              return (
                 <div
-                  className={`max-w-[75%] rounded-3xl px-5 py-4 shadow-lg transition-all ${
+                  key={index}
+                  className={`flex ${
                     isMe
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                      : "bg-white border border-gray-200"
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
-
-                  <p className="text-xs opacity-70 mb-2 font-semibold">
-                    {isMe ? "You" : "🎭 Anonymous"}
-                  </p>
-
-                  <p className="text-base break-words">
-                    {msg.text}
-                  </p>
-
-                  <div className="flex justify-end mt-2">
-
-                    <p className="text-[11px] opacity-70">
-
-                      {new Date(
-                        msg.createdAt
-                      ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-
+                  <div
+                    className={`max-w-[75%] rounded-3xl px-5 py-4 shadow-lg transition-all ${
+                      isMe
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        : "bg-white border border-gray-200"
+                    }`}
+                  >
+                    <p className="text-xs opacity-70 mb-2 font-semibold">
+                      {isMe ? "You" : "🎭 Anonymous"}
                     </p>
 
+                    <p className="text-base break-words">
+                      {msg.text}
+                    </p>
+
+                    <div className="flex justify-end mt-2">
+                      <p className="text-[11px] opacity-70">
+                        {new Date(
+                          msg.createdAt
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
                   </div>
-
                 </div>
+              );
+            })
+          )}
 
-              </div>
+          {typing && (
+            <p className="text-gray-500 italic">
+              Anonymous is typing...
+            </p>
+          )}
 
-            );
+          <div ref={bottomRef}></div>
+        </div>
 
-          })
+        <div className="border-t border-white/10 bg-white px-5 py-4">
+          <div className="flex items-center gap-3">
 
-        )}
+            <button
+              className="text-3xl hover:scale-110 transition"
+              type="button"
+            >
+              😊
+            </button>
 
-    
+            <input
+              type="text"
+              placeholder="Type your message..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  sendMessage();
+                }
+              }}
+              className="flex-1 rounded-full border border-slate-300 px-6 py-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300"
+            />
 
-        <div ref={bottomRef}></div>
+            <button
+              className="text-2xl hover:scale-110 transition"
+              type="button"
+            >
+              📎
+            </button>
 
-      </div>
-            {/* ================= INPUT ================= */}
+            <button
+              onClick={sendMessage}
+              className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-7 py-4 text-white font-semibold shadow-lg transition hover:scale-105 hover:shadow-xl"
+            >
+              🚀
+            </button>
 
-      <div className="border-t border-white/10 bg-white px-5 py-4">
-
-        <div className="flex items-center gap-3">
-
-          {/* Emoji Button */}
-
-          <button
-            className="text-3xl hover:scale-110 transition"
-            type="button"
-          >
-            😊
-          </button>
-
-          {/* Message Input */}
-
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={text}
-           onChange={(e) => {
-  setText(e.target.value);
-}}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                sendMessage();
-              }
-            }}
-            className="flex-1 rounded-full border border-slate-300 px-6 py-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-300"
-          />
-
-          {/* Attachment (Future) */}
-
-          <button
-            className="text-2xl hover:scale-110 transition"
-            type="button"
-          >
-            📎
-          </button>
-
-          {/* Send Button */}
-
-          <button
-            onClick={sendMessage}
-            className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-7 py-4 text-white font-semibold shadow-lg transition hover:scale-105 hover:shadow-xl"
-          >
-            🚀
-          </button>
-
+          </div>
         </div>
 
       </div>
-
-    </div>
-
-  </main>
-);
+    </main>
+  );
 }

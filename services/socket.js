@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
+import API_URL from "./api";
 
-const URL = "http://localhost:5000";
-
-export const socket = io(URL, {
+export const socket = io(API_URL, {
   autoConnect: false,
+  transports: ["websocket", "polling"],
 });
