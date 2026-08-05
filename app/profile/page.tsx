@@ -81,36 +81,52 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSave = async (
-    e: React.FormEvent
-  ) => {
-    e.preventDefault();
+  const handleSave = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      const res = await axios.put(
-        "http://localhost:5000/api/profile/update",
-        {
-          username: form.username,
-          bio: form.bio,
-          age: Number(form.age),
-          gender: form.gender,
-          interestedIn: form.interestedIn,
-          location: form.location,
-          interests: form.interests
-            .split(",")
-            .map((i) => i.trim())
-            .filter(Boolean),
-        }
-      );
+  try {
+    const token = localStorage.getItem("token");
 
-      alert(res.data.message);
-    } catch (err: any) {
-      alert(
-        err.response?.data?.message ||
-          "Profile Update Failed"
-      );
-    }
-  };
+    const res = await axios.put(
+      `${API_URL}/api/profile/update`,
+      {
+        username: form.username,
+        bio: form.bio,
+        age: Number(form.age),
+        gender: form.gender,
+        interestedIn: form.interestedIn,
+        location: form.location,
+        interests: form.interests
+          .split(",")
+          .map((i) => i.trim())
+          .filter(Boolean),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert(res.data.message);
+
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+  } } catch (err: any) {
+  console.log(err);
+
+  if (err.response) {
+    alert(
+      `Status: ${err.response.status}\nMessage: ${
+        err.response.data?.message || "Unknown error"
+      }`
+    );
+  } else if (err.request) {
+    alert("No response from backend");
+  } else {
+    alert(err.message);
+  }
+}
+};
 
   const logout = () => {
     localStorage.removeItem("token");
