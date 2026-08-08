@@ -1,15 +1,5 @@
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import Hero from "../components/landing/Hero";
-import Features from "../components/landing/Features";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <Navbar />
-      <Hero />
-      <Features />
-      <Footer />
-    </>
-  );
+  redirect("/intro");
 }
