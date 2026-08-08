@@ -17,7 +17,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     try {
@@ -42,7 +44,7 @@ export default function LoginPage() {
       );
 
       router.push("/dashboard");
-    } catch (err) {
+    } catch (err: any) {
       alert(
         err?.response?.data?.message ||
           "Login Failed"
@@ -60,7 +62,6 @@ export default function LoginPage() {
           "linear-gradient(135deg, #030512 0%, #070b1c 45%, #0d0620 100%)",
       }}
     >
-
       {/* =====================================================
           BACKGROUND GLOW
       ===================================================== */}
@@ -96,7 +97,6 @@ export default function LoginPage() {
       ===================================================== */}
 
       <div className="pointer-events-none absolute inset-0">
-
         {particles.map((_, index) => {
           const left = (index * 37) % 100;
           const top = (index * 61) % 100;
@@ -126,7 +126,6 @@ export default function LoginPage() {
             />
           );
         })}
-
       </div>
 
       {/* =====================================================
@@ -153,7 +152,6 @@ export default function LoginPage() {
           }}
           className="mb-6 flex items-center gap-3"
         >
-
           <div
             className="flex h-11 w-11 items-center justify-center rounded-xl text-xl shadow-lg"
             style={{
@@ -166,7 +164,6 @@ export default function LoginPage() {
           </div>
 
           <div>
-
             <h2
               className="text-xl font-extrabold tracking-tight"
               style={{
@@ -191,9 +188,7 @@ export default function LoginPage() {
             >
               Connecting Campus
             </p>
-
           </div>
-
         </motion.div>
 
         {/* =================================================
@@ -217,7 +212,6 @@ export default function LoginPage() {
           }}
           className="w-full"
         >
-
           <div
             className="relative overflow-hidden rounded-3xl border p-8 shadow-2xl sm:p-10"
             style={{
@@ -231,7 +225,6 @@ export default function LoginPage() {
                 "0 0 80px rgba(99,102,241,0.20)",
             }}
           >
-
             {/* Top light */}
 
             <motion.div
@@ -266,7 +259,6 @@ export default function LoginPage() {
               }}
               className="mb-5 text-center"
             >
-
               <motion.div
                 animate={{
                   y: [0, -6, 0],
@@ -285,7 +277,6 @@ export default function LoginPage() {
               >
                 👋
               </motion.div>
-
             </motion.div>
 
             {/* =================================================
@@ -307,7 +298,6 @@ export default function LoginPage() {
               }}
               className="text-center"
             >
-
               <h1
                 className="text-4xl font-extrabold tracking-tight"
                 style={{
@@ -326,7 +316,6 @@ export default function LoginPage() {
                 Your campus connections are
                 waiting for you.
               </p>
-
             </motion.div>
 
             {/* =================================================
@@ -341,7 +330,6 @@ export default function LoginPage() {
               {/* USERNAME */}
 
               <div>
-
                 <label
                   className="mb-2 block text-sm font-medium"
                   style={{
@@ -352,7 +340,6 @@ export default function LoginPage() {
                 </label>
 
                 <div className="relative">
-
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm">
                     👤
                   </span>
@@ -362,9 +349,7 @@ export default function LoginPage() {
                     placeholder="Enter your username"
                     value={username}
                     onChange={(e) =>
-                      setUsername(
-                        e.target.value
-                      )
+                      setUsername(e.target.value)
                     }
                     className="w-full rounded-xl border py-3.5 pl-11 pr-4 outline-none transition"
                     style={{
@@ -376,15 +361,12 @@ export default function LoginPage() {
                     }}
                     required
                   />
-
                 </div>
-
               </div>
 
               {/* PASSWORD */}
 
               <div>
-
                 <label
                   className="mb-2 block text-sm font-medium"
                   style={{
@@ -395,7 +377,6 @@ export default function LoginPage() {
                 </label>
 
                 <div className="relative">
-
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm">
                     🔒
                   </span>
@@ -409,9 +390,7 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) =>
-                      setPassword(
-                        e.target.value
-                      )
+                      setPassword(e.target.value)
                     }
                     className="w-full rounded-xl border py-3.5 pl-11 pr-12 outline-none transition"
                     style={{
@@ -440,9 +419,7 @@ export default function LoginPage() {
                       ? "🙈"
                       : "👁️"}
                   </button>
-
                 </div>
-
               </div>
 
               {/* LOGIN BUTTON */}
@@ -474,7 +451,6 @@ export default function LoginPage() {
                   ? "Logging in..."
                   : "🚀 Login"}
               </motion.button>
-
             </form>
 
             {/* =================================================
@@ -507,9 +483,7 @@ export default function LoginPage() {
             >
               Create your account →
             </Link>
-
           </div>
-
         </motion.div>
 
         {/* =================================================
@@ -525,9 +499,7 @@ export default function LoginPage() {
           CampusConnect · Connecting Campus.
           Creating Connections.
         </p>
-
       </div>
-
     </main>
   );
 }
