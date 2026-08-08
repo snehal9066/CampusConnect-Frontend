@@ -1,0 +1,98 @@
+"use client";
+
+import Image from "next/image";
+import { motion } from "framer-motion";
+
+export default function Students() {
+  return (
+    <>
+      {/* BOY */}
+      <motion.div
+        initial={{
+          x: -500,
+          opacity: 0,
+        }}
+        animate={{
+          x: 0,
+          opacity: 1,
+        }}
+        transition={{
+          x: {
+            duration: 2.5,
+            delay: 1.8,
+            ease: [0.22, 1, 0.36, 1],
+          },
+          opacity: {
+            duration: 1,
+            delay: 1.8,
+          },
+        }}
+        className="absolute bottom-4 left-[18%] z-20"
+      >
+        <motion.div
+          animate={{
+            y: [0, -5, 0],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <Image
+            src="/images/boy.png"
+            alt="CampusConnect student"
+            width={300}
+            height={380}
+            priority
+            className="object-contain drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]"
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* GIRL */}
+      <motion.div
+        initial={{
+          x: 500,
+          opacity: 0,
+        }}
+        animate={{
+          x: 0,
+          opacity: 1,
+        }}
+        transition={{
+          x: {
+            duration: 2.5,
+            delay: 2.4,
+            ease: [0.22, 1, 0.36, 1],
+          },
+          opacity: {
+            duration: 1,
+            delay: 2.4,
+          },
+        }}
+        className="absolute bottom-4 right-[18%] z-20"
+      >
+        <motion.div
+          animate={{
+            y: [0, -5, 0],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <Image
+            src="/images/girl.png"
+            alt="CampusConnect student"
+            width={300}
+            height={380}
+            priority
+            className="object-contain drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]"
+          />
+        </motion.div>
+      </motion.div>
+    </>
+  );
+}
