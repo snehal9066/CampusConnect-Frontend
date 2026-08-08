@@ -27,7 +27,7 @@ export default function Students() {
             delay: 1.8,
           },
         }}
-        className="absolute bottom-4 left-[18%] z-20"
+        className="absolute bottom-0 left-[4%] z-20 sm:left-[12%] md:left-[18%]"
       >
         <motion.div
           animate={{
@@ -45,7 +45,15 @@ export default function Students() {
             width={300}
             height={380}
             priority
-            className="object-contain drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]"
+            className="
+              h-auto
+              w-[135px]
+              object-contain
+              drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]
+              sm:w-[210px]
+              md:w-[260px]
+              lg:w-[300px]
+            "
           />
         </motion.div>
       </motion.div>
@@ -71,7 +79,7 @@ export default function Students() {
             delay: 2.4,
           },
         }}
-        className="absolute bottom-4 right-[18%] z-20"
+        className="absolute bottom-0 right-[4%] z-20 sm:right-[12%] md:right-[18%]"
       >
         <motion.div
           animate={{
@@ -89,7 +97,15 @@ export default function Students() {
             width={300}
             height={380}
             priority
-            className="object-contain drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]"
+            className="
+              h-auto
+              w-[135px]
+              object-contain
+              drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]
+              sm:w-[210px]
+              md:w-[260px]
+              lg:w-[300px]
+            "
           />
         </motion.div>
       </motion.div>

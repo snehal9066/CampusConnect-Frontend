@@ -27,36 +27,76 @@ export default function LoginCard() {
         duration: 1,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="absolute bottom-8 left-1/2 z-50 w-[340px] -translate-x-1/2"
+      className="
+        absolute
+        bottom-4
+        left-1/2
+        z-50
+        w-[calc(100%-32px)]
+        max-w-[340px]
+        -translate-x-1/2
+        sm:bottom-6
+        sm:w-[320px]
+        md:bottom-8
+        md:w-[340px]
+      "
     >
-      <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-slate-950/70 p-7 text-center shadow-[0_0_60px_rgba(99,102,241,0.3)] backdrop-blur-2xl">
+      {/* Purple glow */}
+      <div
+        className="
+          pointer-events-none
+          absolute
+          -top-16
+          left-1/2
+          h-32
+          w-32
+          -translate-x-1/2
+          rounded-full
+          bg-purple-500/20
+          blur-3xl
+          sm:-top-20
+          sm:h-40
+          sm:w-40
+        "
+      />
 
-        <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-purple-500/20 blur-3xl" />
+      <div className="relative">
+        <h2 className="text-xl font-bold text-white sm:text-2xl">
+          Welcome Back
+        </h2>
 
-        <div className="relative">
+        <p className="mt-1 text-xs text-blue-200 sm:mt-2 sm:text-sm">
+          Connect with your campus.
+        </p>
 
-          <h2 className="text-2xl font-bold text-white">
-            Welcome Back
-          </h2>
-
-          <p className="mt-2 text-sm text-blue-200">
-            Connect with your campus.
-          </p>
-
-          <motion.button
-            onClick={handleContinue}
-            whileHover={{
-              scale: 1.03,
-            }}
-            whileTap={{
-              scale: 0.97,
-            }}
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 py-3 font-semibold text-white shadow-lg shadow-purple-900/30"
-          >
-            Continue
-          </motion.button>
-
-        </div>
+        <motion.button
+          onClick={handleContinue}
+          whileHover={{
+            scale: 1.03,
+          }}
+          whileTap={{
+            scale: 0.97,
+          }}
+          className="
+            mt-4
+            w-full
+            rounded-xl
+            bg-gradient-to-r
+            from-blue-600
+            to-purple-600
+            py-2.5
+            text-sm
+            font-semibold
+            text-white
+            shadow-lg
+            shadow-purple-900/30
+            sm:mt-6
+            sm:py-3
+            sm:text-base
+          "
+        >
+          Continue
+        </motion.button>
       </div>
     </motion.div>
   );

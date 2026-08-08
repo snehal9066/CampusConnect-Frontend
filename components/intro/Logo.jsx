@@ -21,7 +21,18 @@ export default function Logo() {
         times: [0, 0.35, 0.7, 1],
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="absolute left-1/2 top-10 z-40 -translate-x-1/2 text-center"
+      className="
+        absolute
+        left-1/2
+        top-6
+        z-40
+        w-full
+        -translate-x-1/2
+        px-4
+        text-center
+        sm:top-8
+        md:top-10
+      "
     >
       {/* Glow behind logo */}
       <motion.div
@@ -38,7 +49,23 @@ export default function Logo() {
           duration: 2,
           ease: "easeOut",
         }}
-        className="absolute left-1/2 top-1/2 -z-10 h-32 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/30 blur-3xl"
+        className="
+          absolute
+          left-1/2
+          top-1/2
+          -z-10
+          h-24
+          w-48
+          -translate-x-1/2
+          -translate-y-1/2
+          rounded-full
+          bg-purple-500/30
+          blur-3xl
+          sm:h-32
+          sm:w-64
+          md:h-32
+          md:w-72
+        "
       />
 
       {/* Logo */}
@@ -50,7 +77,15 @@ export default function Logo() {
           duration: 1.2,
           ease: "easeOut",
         }}
-        className="text-5xl font-extrabold tracking-tight text-white drop-shadow-[0_0_20px_rgba(129,140,248,0.8)] md:text-6xl"
+        className="
+          text-3xl
+          font-extrabold
+          tracking-tight
+          text-white
+          drop-shadow-[0_0_20px_rgba(129,140,248,0.8)]
+          sm:text-4xl
+          md:text-6xl
+        "
       >
         Campus
         <span className="text-purple-400">Connect</span>
@@ -70,7 +105,15 @@ export default function Logo() {
           delay: 9.6,
           duration: 0.8,
         }}
-        className="mt-3 text-sm tracking-wide text-blue-100/90 md:text-lg"
+        className="
+          mt-2
+          text-xs
+          tracking-wide
+          text-blue-100/90
+          sm:mt-3
+          sm:text-sm
+          md:text-lg
+        "
       >
         Connecting Campus.
         <br />
