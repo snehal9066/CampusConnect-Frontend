@@ -41,7 +41,7 @@ export default function Students() {
         >
             <motion.div className="rounded-full p-2">
             <Image
-              src="/images/boy_silhouette.jpg?v=2"
+              src="/images/boy_silhouette.jpg"
               alt="CampusConnect student"
               width={300}
               height={380}
@@ -96,7 +96,7 @@ export default function Students() {
 
             <motion.div className="rounded-full p-2">
             <Image
-              src="/images/girl_silhouette.jpg?v=2"
+              src="/images/girl_silhouette.jpg"
               alt="CampusConnect student"
               width={300}
               height={380}
