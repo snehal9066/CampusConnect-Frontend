@@ -1,9 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+
+const connectionTypes = [
+  { icon: "💕", label: "Dating", color: "from-pink-500 to-rose-500", glow: "rgba(244,114,182,0.9)" },
+  { icon: "🤝", label: "Friendship", color: "from-red-500 to-orange-500", glow: "rgba(248,113,113,0.9)" },
+  { icon: "☕", label: "Coffee Chat", color: "from-amber-500 to-orange-500", glow: "rgba(251,146,60,0.9)" },
+  { icon: "📚", label: "Study Buddy", color: "from-blue-500 to-cyan-500", glow: "rgba(96,165,250,0.9)" },
+];
 
 export default function Connection() {
   const particles = Array.from({ length: 16 });
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % connectionTypes.length);
+    }, 2200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentType = connectionTypes[activeIdx];
 
   return (
     <div className="pointer-events-none absolute inset-0 z-30">
@@ -12,12 +31,12 @@ export default function Connection() {
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         animate={{
-          scaleX: [0, 1, 1, 0],
-          opacity: [0, 1, 1, 0],
+          scaleX: [0, 1, 1, 0.9],
+          opacity: [0, 1, 1, 0.85],
         }}
         transition={{
-          delay: 7,
-          duration: 2.5,
+          delay: 6.8,
+          duration: 3,
           ease: "easeInOut",
         }}
         className="
@@ -32,7 +51,7 @@ export default function Connection() {
           from-cyan-400
           via-purple-400
           to-pink-400
-          shadow-[0_0_12px_3px_rgba(129,140,248,0.8)]
+          shadow-[0_0_14px_4px_rgba(129,140,248,0.8)]
         "
       />
 
@@ -40,12 +59,12 @@ export default function Connection() {
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         animate={{
-          scaleX: [0, 1, 1, 0],
-          opacity: [0, 0.7, 0.7, 0],
+          scaleX: [0, 1, 1, 0.9],
+          opacity: [0, 0.7, 0.7, 0.6],
         }}
         transition={{
-          delay: 7,
-          duration: 2.5,
+          delay: 6.8,
+          duration: 3,
           ease: "easeInOut",
         }}
         className="
@@ -70,11 +89,11 @@ export default function Connection() {
         }}
         animate={{
           left: ["27%", "50%", "73%"],
-          opacity: [0, 1, 1, 0],
-          scale: [0.4, 1.4, 1.1, 0.4],
+          opacity: [0, 1, 1, 0.8],
+          scale: [0.4, 1.4, 1.1, 0.8],
         }}
         transition={{
-          delay: 7.2,
+          delay: 7.0,
           duration: 2.2,
           ease: "easeInOut",
         }}
@@ -96,12 +115,12 @@ export default function Connection() {
           scale: 0,
         }}
         animate={{
-          opacity: [0, 1, 1, 0],
-          scale: [0, 1.8, 2.5, 3],
+          opacity: [0, 1, 1, 0.8],
+          scale: [0, 1.8, 2.5, 2.8],
         }}
         transition={{
-          delay: 7.8,
-          duration: 1.5,
+          delay: 7.4,
+          duration: 2,
           ease: "easeOut",
         }}
         className="
@@ -118,31 +137,47 @@ export default function Connection() {
         "
       />
 
-      {/* Heart */}
+      {/* Dynamic Cycling Connection Icons & Pill */}
       <motion.div
         initial={{
           opacity: 0,
           scale: 0,
         }}
         animate={{
-          opacity: [0, 1, 1, 0],
-          scale: [0, 1.4, 1.1, 0.7],
+          opacity: [0, 1, 1, 1],
+          scale: [0, 1.2, 1, 1],
         }}
         transition={{
-          delay: 7.9,
-          duration: 1.8,
-          ease: "easeInOut",
+          delay: 7.5,
+          duration: 1.2,
+          ease: "easeOut",
         }}
         className="
           absolute
           left-1/2
-          top-[calc(61%-45px)]
+          top-[calc(61%-52px)]
           -translate-x-1/2
-          text-4xl
-          drop-shadow-[0_0_15px_rgba(244,114,182,0.9)]
+          flex
+          flex-col
+          items-center
+          gap-1
         "
       >
-        ❤️
+        <motion.div
+          key={currentType.label}
+          initial={{ scale: 0.5, opacity: 0, y: 10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.5, opacity: 0, y: -10 }}
+          transition={{ duration: 0.4 }}
+          className="flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/80 px-4 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.4)] backdrop-blur-xl"
+        >
+          <span className="text-2xl drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+            {currentType.icon}
+          </span>
+          <span className="text-xs font-bold text-white tracking-wide">
+            {currentType.label}
+          </span>
+        </motion.div>
       </motion.div>
 
       {/* Floating particles */}
@@ -165,8 +200,8 @@ export default function Connection() {
               y: Math.sin(angle) * (35 + (index % 4) * 15),
             }}
             transition={{
-              delay: 7.8 + index * 0.03,
-              duration: 1.6,
+              delay: 7.6 + index * 0.03,
+              duration: 2,
               ease: "easeOut",
             }}
             className="

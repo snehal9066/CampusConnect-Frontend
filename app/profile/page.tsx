@@ -15,6 +15,11 @@ interface ProfileForm {
   purpose: string;
   location: string;
   interests: string;
+
+  studySubjects: string[];
+  studyAvailability: string[];
+  studyMode: string;
+  studyStyle: string;
 }
 
 const purposeOptions = [
@@ -27,7 +32,7 @@ const purposeOptions = [
   {
     value: "Friendship",
     label: "Friendship",
-    icon: "❤️",
+    icon: "🤝",
     description: "Make a genuine friend",
   },
   {
@@ -44,6 +49,24 @@ const purposeOptions = [
   },
 ];
 
+const studySubjects = [
+  "Artificial Intelligence",
+  "Machine Learning",
+  "Data Science",
+  "Python",
+  "Web Development",
+  "Algorithms",
+  "Database",
+];
+
+const studyAvailability = [
+  "Morning",
+  "Afternoon",
+  "Evening",
+  "Night",
+  "Weekend",
+];
+
 export default function ProfilePage() {
   const [form, setForm] = useState<ProfileForm>({
     username: "",
@@ -54,6 +77,11 @@ export default function ProfilePage() {
     purpose: "Friendship",
     location: "",
     interests: "",
+
+    studySubjects: [],
+    studyAvailability: [],
+    studyMode: "Both",
+    studyStyle: "Both",
   });
 
   const [image, setImage] =
@@ -132,6 +160,28 @@ export default function ProfilePage() {
                   ", "
                 )
               : "",
+
+          studySubjects:
+            Array.isArray(
+              profile.studySubjects
+            )
+              ? profile.studySubjects
+              : [],
+
+          studyAvailability:
+            Array.isArray(
+              profile.studyAvailability
+            )
+              ? profile.studyAvailability
+              : [],
+
+          studyMode:
+            profile.studyMode ||
+            "Both",
+
+          studyStyle:
+            profile.studyStyle ||
+            "Both",
         });
 
         localStorage.setItem(
@@ -162,7 +212,70 @@ export default function ProfilePage() {
   ) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
+    });
+
+    setMessage("");
+    setError("");
+  };
+
+  // ==========================================
+  // TOGGLE SUBJECT
+  // ==========================================
+
+  const toggleSubject = (
+    subject: string
+  ) => {
+    setForm((prev) => {
+      const exists =
+        prev.studySubjects.includes(
+          subject
+        );
+
+      return {
+        ...prev,
+        studySubjects: exists
+          ? prev.studySubjects.filter(
+              (item) =>
+                item !== subject
+            )
+          : [
+              ...prev.studySubjects,
+              subject,
+            ],
+      };
+    });
+
+    setMessage("");
+    setError("");
+  };
+
+  // ==========================================
+  // TOGGLE AVAILABILITY
+  // ==========================================
+
+  const toggleAvailability = (
+    time: string
+  ) => {
+    setForm((prev) => {
+      const exists =
+        prev.studyAvailability.includes(
+          time
+        );
+
+      return {
+        ...prev,
+        studyAvailability: exists
+          ? prev.studyAvailability.filter(
+              (item) =>
+                item !== time
+            )
+          : [
+              ...prev.studyAvailability,
+              time,
+            ],
+      };
     });
 
     setMessage("");
@@ -266,31 +379,65 @@ export default function ProfilePage() {
       const token =
         localStorage.getItem("token");
 
+      if (!token) {
+        setError(
+          "Please login again."
+        );
+
+        return;
+      }
+
       const res = await axios.put(
         `${API_URL}/api/profile/update`,
         {
           username: form.username,
+
           bio: form.bio,
-          age: Number(form.age),
-          gender: form.gender,
+
+          age: form.age
+            ? Number(form.age)
+            : null,
+
+          gender:
+            form.gender,
+
           interestedIn:
             form.interestedIn,
 
-          // IMPORTANT:
-          // Uses exact values from User.js
-          purpose: form.purpose,
+          purpose:
+            form.purpose,
 
-          location: form.location,
+          location:
+            form.location,
 
           interests:
             form.interests
               .split(",")
-              .map((i) => i.trim())
+              .map((i) =>
+                i.trim()
+              )
               .filter(Boolean),
+
+          // ==========================
+          // STUDY BUDDY
+          // ==========================
+
+          studySubjects:
+            form.studySubjects,
+
+          studyAvailability:
+            form.studyAvailability,
+
+          studyMode:
+            form.studyMode,
+
+          studyStyle:
+            form.studyStyle,
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization:
+              `Bearer ${token}`,
           },
         }
       );
@@ -300,7 +447,9 @@ export default function ProfilePage() {
 
       localStorage.setItem(
         "user",
-        JSON.stringify(updatedUser)
+        JSON.stringify(
+          updatedUser
+        )
       );
 
       setProfileImage(
@@ -316,11 +465,12 @@ export default function ProfilePage() {
         bio:
           updatedUser.bio || "",
 
-        age: updatedUser.age
-          ? String(
-              updatedUser.age
-            )
-          : "",
+        age:
+          updatedUser.age
+            ? String(
+                updatedUser.age
+              )
+            : "",
 
         gender:
           updatedUser.gender ||
@@ -346,6 +496,28 @@ export default function ProfilePage() {
                 ", "
               )
             : "",
+
+        studySubjects:
+          Array.isArray(
+            updatedUser.studySubjects
+          )
+            ? updatedUser.studySubjects
+            : [],
+
+        studyAvailability:
+          Array.isArray(
+            updatedUser.studyAvailability
+          )
+            ? updatedUser.studyAvailability
+            : [],
+
+        studyMode:
+          updatedUser.studyMode ||
+          "Both",
+
+        studyStyle:
+          updatedUser.studyStyle ||
+          "Both",
       });
 
       setMessage(
@@ -379,12 +551,24 @@ export default function ProfilePage() {
   // ==========================================
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("matchId");
-    localStorage.removeItem("partner");
+    localStorage.removeItem(
+      "token"
+    );
 
-    window.location.href = "/login";
+    localStorage.removeItem(
+      "user"
+    );
+
+    localStorage.removeItem(
+      "matchId"
+    );
+
+    localStorage.removeItem(
+      "partner"
+    );
+
+    window.location.href =
+      "/login";
   };
 
   // ==========================================
@@ -402,18 +586,10 @@ export default function ProfilePage() {
   const interestTags =
     form.interests
       .split(",")
-      .map((item) => item.trim())
+      .map((item) =>
+        item.trim()
+      )
       .filter(Boolean);
-
-  // ==========================================
-  // SELECTED PURPOSE
-  // ==========================================
-
-  const selectedPurpose =
-    purposeOptions.find(
-      (purpose) =>
-        purpose.value === form.purpose
-    );
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
@@ -498,12 +674,10 @@ export default function ProfilePage() {
       </nav>
 
       {/* ====================================== */}
-      {/* CONTENT */}
+      {/* MAIN CONTENT */}
       {/* ====================================== */}
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 py-10 sm:px-6 md:py-14">
-
-        {/* PAGE TITLE */}
+      <div className="relative z-10 mx-auto max-w-5xl px-5 py-10 sm:px-6">
 
         <motion.div
           initial={{
@@ -517,266 +691,190 @@ export default function ProfilePage() {
           transition={{
             duration: 0.6,
           }}
-          className="mb-8"
+          className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-2xl backdrop-blur-xl"
         >
 
-          <p className="text-sm font-semibold tracking-wider text-purple-300">
-            YOUR IDENTITY
-          </p>
-
-          <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">
-            Your Profile
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-slate-400">
-            Tell people a little about
-            yourself. Your profile helps
-            CampusConnect find better
-            connections for you.
-          </p>
-
-        </motion.div>
-
-        {/* ====================================== */}
-        {/* PROFILE CARD */}
-        {/* ====================================== */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 25,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.1,
-            duration: 0.7,
-          }}
-          className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] shadow-2xl backdrop-blur-xl"
-        >
-
+          {/* ====================================== */}
           {/* COVER */}
+          {/* ====================================== */}
 
-          <div className="relative h-44 overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 sm:h-52">
+          <div className="h-44 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500" />
 
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_40%)]" />
+          {/* ====================================== */}
+          {/* AVATAR */}
+          {/* ====================================== */}
 
-            <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-white/10 blur-3xl" />
+          <div className="-mt-20 flex flex-col items-center px-5">
 
-            <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-blue-400/20 blur-3xl" />
+            {previewImage ? (
+              <img
+                src={previewImage}
+                alt="Profile"
+                className="h-40 w-40 rounded-full border-4 border-white object-cover shadow-xl"
+              />
+            ) : (
+              <div className="flex h-40 w-40 items-center justify-center rounded-full border-4 border-white bg-slate-700 text-7xl shadow-xl">
+                👤
+              </div>
+            )}
+
+            <h1 className="mt-5 text-center text-4xl font-bold text-white">
+              {form.username ||
+                "Your Profile"}
+            </h1>
+
+            <p className="mt-2 text-slate-300">
+              🎓 CampusConnect Student
+            </p>
 
           </div>
 
-          {/* PROFILE HEADER */}
+          {/* ====================================== */}
+          {/* STATS */}
+          {/* ====================================== */}
 
-          <div className="relative px-6 pb-8 sm:px-10">
+          <div className="grid gap-3 p-6 sm:grid-cols-3 sm:p-10">
 
-            <div className="-mt-20 flex flex-col items-center sm:flex-row sm:items-end sm:gap-6">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
 
-              {/* AVATAR */}
-
-              <div className="relative shrink-0">
-
-                {previewImage ? (
-
-                  <img
-                    src={previewImage}
-                    alt="Profile"
-                    className="h-40 w-40 rounded-[2rem] border-4 border-slate-900 object-cover shadow-2xl"
-                  />
-
-                ) : (
-
-                  <div className="flex h-40 w-40 items-center justify-center rounded-[2rem] border-4 border-slate-900 bg-gradient-to-br from-slate-700 to-slate-800 text-7xl shadow-2xl">
-                    👤
-                  </div>
-
-                )}
-
-                <div className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full border-4 border-slate-900 bg-green-500 text-sm">
-                  ✓
-                </div>
-
+              <div className="text-2xl">
+                ❤️
               </div>
 
-              {/* NAME */}
+              <p className="mt-2 text-2xl font-bold">
+                0
+              </p>
 
-              <div className="mt-5 text-center sm:mb-2 sm:mt-0 sm:text-left">
-
-                <h2 className="text-3xl font-bold">
-                  {form.username ||
-                    "Your Name"}
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-400">
-                  🎓 CampusConnect
-                  Student
-                </p>
-
-                {form.location && (
-                  <p className="mt-1 text-sm text-slate-500">
-                    📍 {form.location}
-                  </p>
-                )}
-
-              </div>
+              <p className="text-xs text-slate-500">
+                Matches
+              </p>
 
             </div>
 
-            {/* STATS */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-                <div className="text-2xl">
-                  💜
-                </div>
-                <p className="mt-2 text-2xl font-bold">
-                  0
-                </p>
-                <p className="text-xs text-slate-500">
-                  Matches
-                </p>
+              <div className="text-2xl">
+                💬
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-                <div className="text-2xl">
-                  💬
-                </div>
-                <p className="mt-2 text-2xl font-bold">
-                  0
-                </p>
-                <p className="text-xs text-slate-500">
-                  Chats
-                </p>
-              </div>
+              <p className="mt-2 text-2xl font-bold">
+                0
+              </p>
 
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-                <div className="text-2xl">
-                  🤝
-                </div>
-                <p className="mt-2 text-2xl font-bold">
-                  0
-                </p>
-                <p className="text-xs text-slate-500">
-                  Friends
-                </p>
-              </div>
+              <p className="text-xs text-slate-500">
+                Chats
+              </p>
 
             </div>
 
-            {/* CURRENT PURPOSE */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
 
-            <div className="mt-5 rounded-2xl border border-purple-400/10 bg-purple-500/[0.06] p-4">
-
-              <div className="flex items-center gap-4">
-
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-2xl">
-                  {selectedPurpose?.icon ||
-                    "🎯"}
-                </div>
-
-                <div>
-
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-purple-300">
-                    Looking for
-                  </p>
-
-                  <p className="mt-1 font-semibold">
-                    {selectedPurpose?.label ||
-                      "Friendship"}
-                  </p>
-
-                  <p className="text-xs text-slate-500">
-                    {selectedPurpose?.description ||
-                      "Make a genuine friend"}
-                  </p>
-
-                </div>
-
+              <div className="text-2xl">
+                👥
               </div>
+
+              <p className="mt-2 text-2xl font-bold">
+                0
+              </p>
+
+              <p className="text-xs text-slate-500">
+                Friends
+              </p>
 
             </div>
 
           </div>
 
           {/* ====================================== */}
-          {/* EDIT FORM */}
+          {/* FORM */}
           {/* ====================================== */}
 
           <form
             onSubmit={handleSave}
-            className="border-t border-white/10 px-6 py-8 sm:px-10"
+            className="px-6 pb-8 sm:px-10"
           >
 
-            <div className="mb-7">
+            {/* ====================================== */}
+            {/* BASIC INFORMATION */}
+            {/* ====================================== */}
+
+            <div className="border-t border-white/10 pt-8">
 
               <p className="text-xs font-semibold uppercase tracking-wider text-purple-300">
                 Personal Information
               </p>
 
               <h2 className="mt-2 text-2xl font-bold">
-                Tell us about you
+                Tell us about yourself
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
-                Keep your profile authentic
-                so your connections know what
-                to expect.
-              </p>
+              <div className="mt-6 grid gap-5 md:grid-cols-2">
 
-            </div>
+                {/* USERNAME */}
 
-            {/* BIO */}
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">
+                    Username
+                  </label>
 
-            <div>
+                  <input
+                    type="text"
+                    name="username"
+                    value={
+                      form.username
+                    }
+                    disabled
+                    className="w-full rounded-2xl border border-white/10 bg-slate-800/40 p-4 text-sm text-slate-400 outline-none"
+                  />
+                </div>
 
-              <label className="mb-2 block text-sm font-semibold">
-                📝 About You
-              </label>
+                {/* AGE */}
 
-              <textarea
-                name="bio"
-                rows={4}
-                maxLength={300}
-                value={form.bio}
-                onChange={handleChange}
-                placeholder="Tell people something interesting about yourself..."
-                className="w-full resize-none rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
-              />
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">
+                    Age
+                  </label>
 
-              <p className="mt-2 text-right text-xs text-slate-600">
-                {form.bio.length}/300
-              </p>
+                  <input
+                    type="number"
+                    name="age"
+                    min="13"
+                    max="100"
+                    value={form.age}
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Your age"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
+                  />
+                </div>
 
-            </div>
+              </div>
 
-            {/* AGE + LOCATION */}
+              {/* BIO */}
 
-            <div className="mt-6 grid gap-5 md:grid-cols-2">
-
-              <div>
+              <div className="mt-5">
 
                 <label className="mb-2 block text-sm font-semibold">
-                  🎂 Age
+                  Bio
                 </label>
 
-                <input
-                  type="number"
-                  name="age"
-                  min="16"
-                  max="100"
-                  value={form.age}
-                  onChange={handleChange}
-                  placeholder="Your age"
-                  className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
+                <textarea
+                  name="bio"
+                  value={form.bio}
+                  onChange={
+                    handleChange
+                  }
+                  rows={4}
+                  placeholder="Tell other students a little about yourself..."
+                  className="w-full resize-none rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
                 />
 
               </div>
 
-              <div>
+              {/* LOCATION */}
+
+              <div className="mt-5">
 
                 <label className="mb-2 block text-sm font-semibold">
                   📍 Location
@@ -785,8 +883,12 @@ export default function ProfilePage() {
                 <input
                   type="text"
                   name="location"
-                  value={form.location}
-                  onChange={handleChange}
+                  value={
+                    form.location
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Where are you from?"
                   className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
                 />
@@ -795,7 +897,9 @@ export default function ProfilePage() {
 
             </div>
 
-            {/* GENDER + INTERESTED IN */}
+            {/* ====================================== */}
+            {/* CONNECTION PREFERENCES */}
+            {/* ====================================== */}
 
             <div className="mt-8">
 
@@ -805,6 +909,8 @@ export default function ProfilePage() {
 
               <div className="grid gap-5 md:grid-cols-2">
 
+                {/* GENDER */}
+
                 <div>
 
                   <label className="mb-2 block text-sm font-semibold">
@@ -813,11 +919,14 @@ export default function ProfilePage() {
 
                   <select
                     name="gender"
-                    value={form.gender}
-                    onChange={handleChange}
+                    value={
+                      form.gender
+                    }
+                    onChange={
+                      handleChange
+                    }
                     className="w-full rounded-2xl border border-white/10 bg-slate-800 p-4 text-sm text-white outline-none focus:border-purple-400/40"
                   >
-
                     <option value="Male">
                       Male
                     </option>
@@ -829,15 +938,16 @@ export default function ProfilePage() {
                     <option value="Other">
                       Other
                     </option>
-
                   </select>
 
                 </div>
 
+                {/* INTERESTED IN */}
+
                 <div>
 
                   <label className="mb-2 block text-sm font-semibold">
-                    💜 Interested In
+                    💗 Interested In
                   </label>
 
                   <select
@@ -845,10 +955,11 @@ export default function ProfilePage() {
                     value={
                       form.interestedIn
                     }
-                    onChange={handleChange}
+                    onChange={
+                      handleChange
+                    }
                     className="w-full rounded-2xl border border-white/10 bg-slate-800 p-4 text-sm text-white outline-none focus:border-purple-400/40"
                   >
-
                     <option value="Male">
                       Male
                     </option>
@@ -860,7 +971,6 @@ export default function ProfilePage() {
                     <option value="Everyone">
                       Everyone
                     </option>
-
                   </select>
 
                 </div>
@@ -949,7 +1059,266 @@ export default function ProfilePage() {
 
             </div>
 
+            {/* ====================================== */}
+            {/* STUDY BUDDY PREFERENCES */}
+            {/* ====================================== */}
+
+            {form.purpose ===
+              "Study Buddy" && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: 15,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                className="mt-8 rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-500/[0.08] to-purple-500/[0.08] p-5 sm:p-7"
+              >
+
+                <div className="mb-6">
+
+                  <div className="flex items-center gap-3">
+
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/20 text-2xl">
+                      📚
+                    </div>
+
+                    <div>
+
+                      <h2 className="text-xl font-bold">
+                        Study Buddy Preferences
+                      </h2>
+
+                      <p className="mt-1 text-xs text-slate-400">
+                        Help us find students
+                        who study like you.
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* SUBJECTS */}
+
+                <div>
+
+                  <label className="mb-3 block text-sm font-semibold">
+                    📚 What do you study?
+                  </label>
+
+                  <div className="grid gap-2 sm:grid-cols-2">
+
+                    {studySubjects.map(
+                      (subject) => {
+
+                        const selected =
+                          form.studySubjects.includes(
+                            subject
+                          );
+
+                        return (
+                          <button
+                            key={subject}
+                            type="button"
+                            onClick={() =>
+                              toggleSubject(
+                                subject
+                              )
+                            }
+                            className={`rounded-xl border p-3 text-left text-sm transition ${
+                              selected
+                                ? "border-blue-400/50 bg-blue-500/20 text-blue-200"
+                                : "border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/[0.07]"
+                            }`}
+                          >
+                            <span className="mr-2">
+                              {selected
+                                ? "☑"
+                                : "☐"}
+                            </span>
+
+                            {subject}
+                          </button>
+                        );
+                      }
+                    )}
+
+                  </div>
+
+                  <p className="mt-2 text-xs text-slate-500">
+                    Select all subjects that
+                    interest you.
+                  </p>
+
+                </div>
+
+                {/* AVAILABILITY */}
+
+                <div className="mt-7">
+
+                  <label className="mb-3 block text-sm font-semibold">
+                    🕐 When do you prefer to study?
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+
+                    {studyAvailability.map(
+                      (time) => {
+
+                        const selected =
+                          form.studyAvailability.includes(
+                            time
+                          );
+
+                        return (
+                          <button
+                            key={time}
+                            type="button"
+                            onClick={() =>
+                              toggleAvailability(
+                                time
+                              )
+                            }
+                            className={`rounded-xl border p-3 text-sm transition ${
+                              selected
+                                ? "border-purple-400/50 bg-purple-500/20 text-purple-200"
+                                : "border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/[0.07]"
+                            }`}
+                          >
+                            {selected
+                              ? "☑"
+                              : "☐"}{" "}
+                            {time}
+                          </button>
+                        );
+                      }
+                    )}
+
+                  </div>
+
+                </div>
+
+                {/* STUDY MODE */}
+
+                <div className="mt-7">
+
+                  <label className="mb-3 block text-sm font-semibold">
+                    💻 Preferred Study Mode
+                  </label>
+
+                  <div className="grid gap-2 sm:grid-cols-3">
+
+                    {[
+                      "Online",
+                      "In Person",
+                      "Both",
+                    ].map((mode) => {
+
+                      const selected =
+                        form.studyMode ===
+                        mode;
+
+                      return (
+                        <button
+                          key={mode}
+                          type="button"
+                          onClick={() =>
+                            setForm({
+                              ...form,
+                              studyMode:
+                                mode,
+                            })
+                          }
+                          className={`rounded-xl border p-3 text-sm transition ${
+                            selected
+                              ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-200"
+                              : "border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/[0.07]"
+                          }`}
+                        >
+                          {selected
+                            ? "●"
+                            : "○"}{" "}
+                          {mode}
+                        </button>
+                      );
+                    })}
+
+                  </div>
+
+                </div>
+
+                {/* STUDY STYLE */}
+
+                <div className="mt-7">
+
+                  <label className="mb-3 block text-sm font-semibold">
+                    🧠 Study Style
+                  </label>
+
+                  <div className="grid gap-2 sm:grid-cols-3">
+
+                    {[
+                      "Quiet",
+                      "Discussion",
+                      "Both",
+                    ].map((style) => {
+
+                      const selected =
+                        form.studyStyle ===
+                        style;
+
+                      return (
+                        <button
+                          key={style}
+                          type="button"
+                          onClick={() =>
+                            setForm({
+                              ...form,
+                              studyStyle:
+                                style,
+                            })
+                          }
+                          className={`rounded-xl border p-3 text-sm transition ${
+                            selected
+                              ? "border-blue-400/50 bg-blue-500/20 text-blue-200"
+                              : "border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/[0.07]"
+                          }`}
+                        >
+                          {selected
+                            ? "●"
+                            : "○"}{" "}
+                          {style}
+                        </button>
+                      );
+                    })}
+
+                  </div>
+
+                </div>
+
+                {/* SUMMARY */}
+
+                <div className="mt-7 rounded-2xl border border-blue-400/10 bg-blue-500/[0.06] p-4">
+
+                  <p className="text-xs leading-5 text-slate-400">
+                    🎯 These preferences are used
+                    to find a more compatible Study
+                    Buddy. Gender does not restrict
+                    Study Buddy matching.
+                  </p>
+
+                </div>
+
+              </motion.div>
+            )}
+
+            {/* ====================================== */}
             {/* PRIVACY */}
+            {/* ====================================== */}
 
             <div className="mt-5 rounded-2xl border border-purple-400/10 bg-purple-500/[0.06] p-4">
 
@@ -976,8 +1345,12 @@ export default function ProfilePage() {
               <input
                 type="text"
                 name="interests"
-                value={form.interests}
-                onChange={handleChange}
+                value={
+                  form.interests
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Coding, AI, Music, Cricket..."
                 className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
               />
@@ -1078,14 +1451,11 @@ export default function ProfilePage() {
                           e
                         ) => {
                           if (
-                            e.target
-                              .files &&
-                            e.target
-                              .files[0]
+                            e.target.files &&
+                            e.target.files[0]
                           ) {
                             setImage(
-                              e.target
-                                .files[0]
+                              e.target.files[0]
                             );
                           }
                         }}
@@ -1217,7 +1587,9 @@ export default function ProfilePage() {
 
       </div>
 
+      {/* ====================================== */}
       {/* FOOTER */}
+      {/* ====================================== */}
 
       <footer className="relative z-10 py-8 text-center text-xs text-slate-600">
         CampusConnect · Connecting Campus.

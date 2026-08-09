@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import API_URL from "../../services/api";
+import { socket } from "../../services/socket";
 
 interface Friend {
   _id: string;
@@ -46,6 +47,9 @@ export default function FriendsPage() {
   const [error, setError] =
     useState("");
 
+  const [onlineUserIds, setOnlineUserIds] =
+    useState<Set<string>>(new Set());
+
   // =====================================================
   // LOAD FRIENDS
   // =====================================================
@@ -80,6 +84,14 @@ export default function FriendsPage() {
 
         if (Array.isArray(res.data)) {
           setFriends(res.data);
+
+          // Check online status for each friend
+          socket.connect();
+          res.data.forEach((f: Friend) => {
+            if (f._id) {
+              socket.emit("checkUserStatus", f._id);
+            }
+          });
         } else {
           setFriends([]);
         }
@@ -114,7 +126,41 @@ export default function FriendsPage() {
       }
     };
 
+    const handleUserOnline = (id: string) => {
+      setOnlineUserIds((prev) => new Set(prev).add(String(id)));
+    };
+
+    const handleUserOffline = (id: string) => {
+      setOnlineUserIds((prev) => {
+        const next = new Set(prev);
+        next.delete(String(id));
+        return next;
+      });
+    };
+
+    const handleUserStatusResult = (data: { userId: string; isOnline: boolean }) => {
+      if (data.isOnline) {
+        setOnlineUserIds((prev) => new Set(prev).add(String(data.userId)));
+      } else {
+        setOnlineUserIds((prev) => {
+          const next = new Set(prev);
+          next.delete(String(data.userId));
+          return next;
+        });
+      }
+    };
+
+    socket.on("userOnline", handleUserOnline);
+    socket.on("userOffline", handleUserOffline);
+    socket.on("userStatusResult", handleUserStatusResult);
+
     loadFriends();
+
+    return () => {
+      socket.off("userOnline", handleUserOnline);
+      socket.off("userOffline", handleUserOffline);
+      socket.off("userStatusResult", handleUserStatusResult);
+    };
   }, [router]);
 
   // =====================================================
@@ -443,23 +489,29 @@ export default function FriendsPage() {
 
                       {/* Avatar */}
 
-                      {friend.profileImage ? (
-                        <img
-                          src={
-                            friend.profileImage
-                          }
-                          alt={
-                            friend.fullName ||
-                            friend.username ||
-                            "Friend"
-                          }
-                          className="h-24 w-24 shrink-0 rounded-3xl border-2 border-white/10 object-cover shadow-xl"
-                        />
-                      ) : (
-                        <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-5xl shadow-xl">
-                          👤
-                        </div>
-                      )}
+                      <div className="relative shrink-0">
+                        {friend.profileImage ? (
+                          <img
+                            src={
+                              friend.profileImage
+                            }
+                            alt={
+                              friend.fullName ||
+                              friend.username ||
+                              "Friend"
+                            }
+                            className="h-24 w-24 rounded-3xl border-2 border-white/10 object-cover shadow-xl"
+                          />
+                        ) : (
+                          <div className="flex h-24 w-24 items-center justify-center rounded-3xl border border-white/10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-5xl shadow-xl">
+                            👤
+                          </div>
+                        )}
+
+                        {onlineUserIds.has(String(friend._id)) && (
+                          <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full border-2 border-[#040714] bg-green-500 shadow-sm" title="Online" />
+                        )}
+                      </div>
 
                       {/* User information */}
 

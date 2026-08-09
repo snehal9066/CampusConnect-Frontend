@@ -25,6 +25,7 @@ export default function ChatPage() {
   const [showStarters, setShowStarters] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [error, setError] = useState("");
+  const [partnerOnline, setPartnerOnline] = useState(false);
 
   const bottomRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -291,6 +292,27 @@ export default function ChatPage() {
       setTyping(false);
     };
 
+    const handleUserOnline = (onlineUserId) => {
+      if ((partner?._id && String(onlineUserId) === String(partner._id)) ||
+          (partner?.username && String(onlineUserId) === String(partner.username))) {
+        setPartnerOnline(true);
+      }
+    };
+
+    const handleUserOffline = (offlineUserId) => {
+      if ((partner?._id && String(offlineUserId) === String(partner._id)) ||
+          (partner?.username && String(offlineUserId) === String(partner.username))) {
+        setPartnerOnline(false);
+      }
+    };
+
+    const handleUserStatusResult = (data) => {
+      if ((partner?._id && String(data.userId) === String(partner._id)) ||
+          (partner?.username && String(data.userId) === String(partner.username))) {
+        setPartnerOnline(data.isOnline);
+      }
+    };
+
     // Register listeners BEFORE connect
     socket.on(
       "connect",
@@ -317,12 +339,20 @@ export default function ChatPage() {
       handleDisconnect
     );
 
+    socket.on("userOnline", handleUserOnline);
+    socket.on("userOffline", handleUserOffline);
+    socket.on("userStatusResult", handleUserStatusResult);
+
     // Connect
     socket.connect();
 
     // If socket is already connected
     if (socket.connected) {
       handleConnect();
+    }
+
+    if (partner?._id) {
+      socket.emit("checkUserStatus", partner._id);
     }
 
     loadMessages();
@@ -358,6 +388,10 @@ export default function ChatPage() {
         "disconnect",
         handleDisconnect
       );
+
+      socket.off("userOnline", handleUserOnline);
+      socket.off("userOffline", handleUserOffline);
+      socket.off("userStatusResult", handleUserStatusResult);
 
       if (typingTimeoutRef.current) {
         clearTimeout(
@@ -683,9 +717,7 @@ export default function ChatPage() {
 
                   🎭
 
-                  {connected && (
-                    <span className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500" />
-                  )}
+                  <span className={`absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white ${partnerOnline ? "bg-green-500" : "bg-slate-300"}`} />
 
                 </div>
 
@@ -698,12 +730,12 @@ export default function ChatPage() {
 
                   <p
                     className={`mt-1 text-xs ${
-                      connected
-                        ? "text-green-600"
+                      partnerOnline
+                        ? "text-green-600 font-medium"
                         : "text-slate-400"
                     }`}
                   >
-                    {connected
+                    {partnerOnline
                       ? "● Online"
                       : "● Offline"}
                   </p>
@@ -715,6 +747,46 @@ export default function ChatPage() {
               <div className="mt-5 rounded-xl border border-purple-100 bg-purple-50 px-3 py-2 text-center text-xs font-medium text-purple-600">
                 {displayPurpose}
               </div>
+
+              {(connectionPurpose === "Study Buddy" || connectionPurpose === "study" || partner.compatibilityScore !== undefined) && (
+                <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 text-xs">
+                  <div className="flex items-center justify-between font-bold text-blue-700">
+                    <span>📚 Study Buddy Match</span>
+                    {partner.compatibilityScore !== null && partner.compatibilityScore !== undefined && (
+                      <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] text-white">
+                        {partner.compatibilityScore}% Score
+                      </span>
+                    )}
+                  </div>
+
+                  {Array.isArray(partner.studySubjects) && partner.studySubjects.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Subjects</p>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {partner.studySubjects.map((subject, idx) => (
+                          <span key={idx} className="rounded-md bg-white border border-blue-200 px-1.5 py-0.5 text-[10px] text-blue-800">
+                            {subject}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {Array.isArray(partner.studyAvailability) && partner.studyAvailability.length > 0 && (
+                    <div className="mt-2.5">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Availability</p>
+                      <p className="mt-0.5 text-slate-700 font-medium">{partner.studyAvailability.join(", ")}</p>
+                    </div>
+                  )}
+
+                  {(partner.studyMode || partner.studyStyle) && (
+                    <div className="mt-2 flex gap-3 text-slate-600 text-[11px]">
+                      {partner.studyMode && <span>Mode: <strong>{partner.studyMode}</strong></span>}
+                      {partner.studyStyle && <span>Style: <strong>{partner.studyStyle}</strong></span>}
+                    </div>
+                  )}
+                </div>
+              )}
 
             </div>
 
@@ -786,12 +858,12 @@ export default function ChatPage() {
 
                   <span
                     className={
-                      connected
-                        ? "text-green-600"
+                      partnerOnline
+                        ? "text-green-600 font-medium"
                         : "text-slate-400"
                     }
                   >
-                    {connected
+                    {partnerOnline
                       ? "Online"
                       : "Offline"}
                   </span>
