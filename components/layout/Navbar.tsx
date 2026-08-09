@@ -54,6 +54,12 @@ export default function Navbar() {
           >
             Contact
           </a>
+          <Link
+            href="/dating"
+            className="text-slate-300 transition hover:text-white"
+          >
+            Dating
+          </Link>
 
         </div>
 
