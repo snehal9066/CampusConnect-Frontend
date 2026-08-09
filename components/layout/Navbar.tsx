@@ -25,7 +25,7 @@ export default function Navbar() {
         </Link>
 
         {/* Navigation */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="flex items-center gap-8">
 
           <Link
             href="/"
@@ -59,6 +59,12 @@ export default function Navbar() {
             className="text-slate-300 transition hover:text-white"
           >
             Dating
+          </Link>
+          <Link
+            href="/tea-spots"
+            className="text-slate-300 transition hover:text-white"
+          >
+            Tea Spots
           </Link>
 
         </div>
