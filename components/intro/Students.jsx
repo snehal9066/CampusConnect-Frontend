@@ -41,7 +41,7 @@ export default function Students() {
         >
           <motion.div className="bg-[rgba(0,30,60,0.4)] rounded-full p-2">
             <Image
-              src="/images/boy_silhouette.jpg"
+              src="/images/boy_silhouette.jpg?v=2"
               alt="CampusConnect student"
               width={300}
               height={380}
@@ -96,7 +96,7 @@ export default function Students() {
 
           <motion.div className="bg-[rgba(0,30,60,0.4)] rounded-full p-2">
             <Image
-              src="/images/girl_silhouette.jpg"
+              src="/images/girl_silhouette.jpg?v=2"
               alt="CampusConnect student"
               width={300}
               height={380}
