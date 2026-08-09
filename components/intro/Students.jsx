@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "next/image"; // Trigger rebuild
 import { motion } from "framer-motion";
 
 export default function Students() {

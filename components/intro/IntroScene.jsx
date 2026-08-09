@@ -1,17 +1,7 @@
 "use client";
 
-import Background from "./Background";
-import Particles from "./Particles";
-import CampusBackground from "./CampusBackground";
-import Students from "./Students";
-import Features from "./Features";
-import Connection from "./Connection";
-import Logo from "./Logo";
-import LoginCard from "./LoginCard";
-import IntroOverlay from "./IntroOverlay";
-"use client";
-
 import { useState, useEffect } from "react";
+
 import Background from "./Background";
 import Particles from "./Particles";
 import CampusBackground from "./CampusBackground";
@@ -26,13 +16,18 @@ export default function IntroScene() {
   const [showOverlay, setShowOverlay] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowOverlay(false), 5000); // 5 seconds
+    const timer = setTimeout(() => {
+      setShowOverlay(false);
+    }, 5000);
+
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden">
+    <main className="relative min-h-screen w-full overflow-hidden">
+      {/* Scene 0 - Intro Overlay */}
       {showOverlay && <IntroOverlay />}
+
       {/* Scene 1 - Animated Background */}
       <Background />
 
@@ -58,4 +53,4 @@ export default function IntroScene() {
       <LoginCard />
     </main>
   );
-}
+}
