@@ -39,22 +39,24 @@ export default function Students() {
             ease: "easeInOut",
           }}
         >
-          <Image
-            src="/images/boy.png"
-            alt="CampusConnect student"
-            width={300}
-            height={380}
-            priority
-            className="
-              h-auto
-              w-[135px]
-              object-contain
-              drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]
-              sm:w-[210px]
-              md:w-[260px]
-              lg:w-[300px]
-            "
-          />
+          <motion.div className="bg-[rgba(0,30,60,0.4)] rounded-full p-2">
+            <Image
+              src="/images/boy_silhouette.jpg"
+              alt="CampusConnect student"
+              width={300}
+              height={380}
+              priority
+              className="
+                h-auto
+                w-[135px]
+                object-contain
+                drop-shadow-[0_12px_25px_rgba(0,180,255,0.6)]
+                sm:w-[210px]
+                md:w-[260px]
+                lg:w-[300px]
+              "
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
 
@@ -91,22 +93,25 @@ export default function Students() {
             ease: "easeInOut",
           }}
         >
-          <Image
-            src="/images/girl.png"
-            alt="CampusConnect student"
-            width={300}
-            height={380}
-            priority
-            className="
-              h-auto
-              w-[135px]
-              object-contain
-              drop-shadow-[0_12px_25px_rgba(0,0,0,0.55)]
-              sm:w-[210px]
-              md:w-[260px]
-              lg:w-[300px]
-            "
-          />
+
+          <motion.div className="bg-[rgba(0,30,60,0.4)] rounded-full p-2">
+            <Image
+              src="/images/girl_silhouette.jpg"
+              alt="CampusConnect student"
+              width={300}
+              height={380}
+              priority
+              className="
+                h-auto
+                w-[135px]
+                object-contain
+                drop-shadow-[0_12px_25px_rgba(0,180,255,0.6)]
+                sm:w-[210px]
+                md:w-[260px]
+                lg:w-[300px]
+              "
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
     </>
