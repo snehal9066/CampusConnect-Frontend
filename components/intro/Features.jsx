@@ -9,11 +9,6 @@ const features = [
     subtitle: "Meet people like you",
   },
   {
-    icon: "❤️",
-    title: "Dating",
-    subtitle: "Find meaningful connections",
-  },
-  {
     icon: "📚",
     title: "Study Buddy",
     subtitle: "Learn together",

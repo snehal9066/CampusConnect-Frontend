@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 const connectionTypes = [
-  { icon: "💕", label: "Dating", color: "from-pink-500 to-rose-500", glow: "rgba(244,114,182,0.9)" },
   { icon: "🤝", label: "Friendship", color: "from-red-500 to-orange-500", glow: "rgba(248,113,113,0.9)" },
   { icon: "☕", label: "Coffee Chat", color: "from-amber-500 to-orange-500", glow: "rgba(251,146,60,0.9)" },
   { icon: "📚", label: "Study Buddy", color: "from-blue-500 to-cyan-500", glow: "rgba(96,165,250,0.9)" },

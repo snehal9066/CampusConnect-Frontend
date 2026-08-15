@@ -39,6 +39,20 @@ const cards = [
     href: "/settings",
     gradient: "from-emerald-500 to-green-600",
   },
+  {
+    title: "Dating",
+    description: "Find romantic connections on campus.",
+    icon: "❤️",
+    href: "/dating",
+    gradient: "from-rose-500 to-pink-600",
+  },
+  {
+    title: "Tea Spots",
+    description: "Explore coffee and tea spots to chat.",
+    icon: "☕",
+    href: "/tea-spots",
+    gradient: "from-amber-500 to-orange-600",
+  },
 ];
 
 interface User {
@@ -260,12 +274,7 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-2 sm:gap-3">
 
-            <Link
-              href="/match"
-              className="hidden rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold transition hover:scale-105 sm:block"
-            >
-              Find Connection
-            </Link>
+            
 
             <Link
               href="/profile"
@@ -378,25 +387,7 @@ export default function Dashboard() {
                 a compatible student for you.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
-
-                <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-slate-300">
-                  💕 Dating
-                </span>
-
-                <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-slate-300">
-                  ❤️ Friendship
-                </span>
-
-                <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-slate-300">
-                  ☕ Coffee Chat
-                </span>
-
-                <span className="rounded-full bg-white/[0.06] px-3 py-1.5 text-xs text-slate-300">
-                  📚 Study Buddy
-                </span>
-
-              </div>
+              <div className="mt-6 flex flex-wrap gap-2"></div>
 
             </div>
 
