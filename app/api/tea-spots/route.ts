@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
+import API_URL from '../../../services/api';
 
 export async function GET(request: Request) {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-  if (!backendUrl) {
+  if (!API_URL) {
     return NextResponse.json({ error: 'Backend URL not configured' }, { status: 500 });
   }
   try {
-    const res = await fetch(`${backendUrl}/api/tea-spots`);
+    const res = await fetch(`${API_URL}/api/tea-spots`);
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {
@@ -16,13 +16,12 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-  if (!backendUrl) {
+  if (!API_URL) {
     return NextResponse.json({ error: 'Backend URL not configured' }, { status: 500 });
   }
   try {
     const body = await request.json();
-    const res = await fetch(`${backendUrl}/api/tea-spots`, {
+    const res = await fetch(`${API_URL}/api/tea-spots`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

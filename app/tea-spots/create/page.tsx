@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import API_URL from '@/services/api';
 
 export default function TeaSpotForm() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function TeaSpotForm() {
     e.preventDefault();
     const payload = { name, description, imageUrl };
     try {
-      const res = await fetch('/api/tea-spots', {
+      const res = await fetch(`${API_URL}/api/tea-spots`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

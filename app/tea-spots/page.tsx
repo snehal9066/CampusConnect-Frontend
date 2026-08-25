@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import TeaSpotCard from '@/components/TeaSpotCard';
 import { useEffect, useState } from 'react';
+import API_URL from '@/services/api';
 
 interface TeaSpot {
   _id: string;
@@ -15,7 +16,7 @@ export default function TeaSpotsPage() {
   const [spots, setSpots] = useState<TeaSpot[]>([]);
 
   useEffect(() => {
-    fetch('/api/tea-spots')
+    fetch(`${API_URL}/api/tea-spots`)
       .then((res) => res.json())
       .then(setSpots)
       .catch(console.error);
