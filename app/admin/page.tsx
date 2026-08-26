@@ -32,16 +32,38 @@ interface CurrentUser {
   role?: string;
 }
 
+interface AuditUser {
+  _id: string;
+  fullName: string;
+  username: string;
+}
+
+interface AuditLog {
+  _id: string;
+  admin: AuditUser | null;
+  action: "SUSPEND_USER" | "UNSUSPEND_USER";
+  targetUser: AuditUser | null;
+  details: string;
+  createdAt: string;
+}
+
 export default function AdminPage() {
   const router = useRouter();
 
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [search, setSearch] = useState("");
+
   const [loading, setLoading] = useState(true);
+  const [auditLoading, setAuditLoading] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
+
+  // ==========================================
+  // TOKEN + HEADERS
+  // ==========================================
 
   const getToken = () => {
     return localStorage.getItem("token");
@@ -57,6 +79,18 @@ export default function AdminPage() {
   };
 
   // ==========================================
+  // HANDLE UNAUTHORIZED SESSION
+  // ==========================================
+
+  const handleUnauthorized = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("currentUser");
+
+    router.replace("/login");
+  };
+
+  // ==========================================
   // FRONTEND ADMIN ACCESS CHECK
   // ==========================================
 
@@ -68,7 +102,6 @@ export default function AdminPage() {
       return false;
     }
 
-    // Try common storage keys used by the app
     const storedUser =
       localStorage.getItem("user") ||
       localStorage.getItem("currentUser");
@@ -87,14 +120,53 @@ export default function AdminPage() {
       }
 
       setAuthorized(true);
+
       return true;
     } catch (error) {
-      console.error("Failed to verify frontend admin access:", error);
+      console.error("Failed to verify admin access:", error);
 
-      localStorage.removeItem("token");
+      handleUnauthorized();
 
-      router.replace("/login");
       return false;
+    }
+  };
+
+  // ==========================================
+  // FETCH AUDIT LOGS
+  // ==========================================
+
+  const fetchAuditLogs = async () => {
+    try {
+      setAuditLoading(true);
+
+      const response = await fetch(
+        `${API_URL}/api/admin/audit-logs`,
+        {
+          headers: getHeaders(),
+        }
+      );
+
+      if (response.status === 401) {
+        handleUnauthorized();
+        return;
+      }
+
+      if (response.status === 403) {
+        router.replace("/dashboard");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to load audit logs");
+      }
+
+      const data = await response.json();
+
+      setAuditLogs(data);
+    } catch (error) {
+      console.error("Audit logs error:", error);
+    } finally {
+      setAuditLoading(false);
     }
   };
 
@@ -110,52 +182,61 @@ export default function AdminPage() {
       const token = getToken();
 
       if (!token) {
-        router.replace("/login");
+        handleUnauthorized();
         return;
       }
 
-      const [statsResponse, usersResponse] = await Promise.all([
+      const [
+        statsResponse,
+        usersResponse,
+        auditResponse,
+      ] = await Promise.all([
         fetch(`${API_URL}/api/admin/stats`, {
           headers: getHeaders(),
         }),
+
         fetch(`${API_URL}/api/admin/users`, {
+          headers: getHeaders(),
+        }),
+
+        fetch(`${API_URL}/api/admin/audit-logs`, {
           headers: getHeaders(),
         }),
       ]);
 
-      // Unauthorized
       if (
         statsResponse.status === 401 ||
-        usersResponse.status === 401
+        usersResponse.status === 401 ||
+        auditResponse.status === 401
       ) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("currentUser");
-
-        router.replace("/login");
+        handleUnauthorized();
         return;
       }
 
-      // Forbidden — backend says this user is not an admin
       if (
         statsResponse.status === 403 ||
-        usersResponse.status === 403
+        usersResponse.status === 403 ||
+        auditResponse.status === 403
       ) {
         router.replace("/dashboard");
         return;
       }
 
-      if (!statsResponse.ok || !usersResponse.ok) {
-        throw new Error(
-          `Admin API failed. Stats: ${statsResponse.status}, Users: ${usersResponse.status}`
-        );
+      if (
+        !statsResponse.ok ||
+        !usersResponse.ok ||
+        !auditResponse.ok
+      ) {
+        throw new Error("Failed to load admin dashboard data");
       }
 
       const statsData = await statsResponse.json();
       const usersData = await usersResponse.json();
+      const auditData = await auditResponse.json();
 
       setStats(statsData);
       setUsers(usersData);
+      setAuditLogs(auditData);
     } catch (err) {
       console.error("Admin dashboard error:", err);
 
@@ -203,11 +284,7 @@ export default function AdminPage() {
       const data = await response.json();
 
       if (response.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("currentUser");
-
-        router.replace("/login");
+        handleUnauthorized();
         return;
       }
 
@@ -242,10 +319,15 @@ export default function AdminPage() {
 
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();
+
         setStats(statsData);
       }
+
+      // Refresh audit logs immediately
+      await fetchAuditLogs();
     } catch (err) {
       console.error("User action error:", err);
+
       alert("Something went wrong while updating the user.");
     } finally {
       setActionLoading(null);
@@ -267,6 +349,17 @@ export default function AdminPage() {
   });
 
   // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  // ==========================================
   // LOADING
   // ==========================================
 
@@ -277,7 +370,7 @@ export default function AdminPage() {
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white" />
 
           <p className="text-white/60">
-            Checking access...
+            Checking admin access...
           </p>
         </div>
       </main>
@@ -311,10 +404,6 @@ export default function AdminPage() {
     );
   }
 
-  // ==========================================
-  // ADMIN DASHBOARD
-  // ==========================================
-
   return (
     <main className="min-h-screen bg-[#070707] px-4 py-8 text-white md:px-8">
       <div className="mx-auto max-w-7xl">
@@ -332,7 +421,7 @@ export default function AdminPage() {
             </h1>
 
             <p className="mt-3 text-white/50">
-              Manage users and monitor your CampusConnect platform.
+              Manage users, monitor activity, and protect your platform.
             </p>
           </div>
 
@@ -340,65 +429,155 @@ export default function AdminPage() {
             onClick={() => router.push("/dashboard")}
             className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.08]"
           >
-            ← Back to Dashboard
+            Back to Dashboard
           </button>
         </div>
 
-        {/* STATS */}
+        {/* STATISTICS */}
 
-        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Users"
-            value={stats?.totalUsers ?? 0}
+            value={stats?.totalUsers || 0}
             subtitle="Registered accounts"
           />
 
           <StatCard
             title="Active Users"
-            value={stats?.activeUsers ?? 0}
-            subtitle="Currently allowed"
+            value={stats?.activeUsers || 0}
+            subtitle="Currently active"
           />
 
           <StatCard
             title="Suspended"
-            value={stats?.suspendedUsers ?? 0}
+            value={stats?.suspendedUsers || 0}
             subtitle="Restricted accounts"
           />
 
           <StatCard
             title="Administrators"
-            value={stats?.adminUsers ?? 0}
-            subtitle="Platform managers"
+            value={stats?.adminUsers || 0}
+            subtitle="Protected accounts"
           />
-        </div>
+        </section>
 
-        {/* USER MANAGEMENT */}
+        {/* AUDIT LOGS */}
 
-        <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
-          <div className="flex flex-col justify-between gap-5 border-b border-white/10 p-6 md:flex-row md:items-center">
+        <section className="mb-10">
+          <div className="mb-5 flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">
-                User Management
+              <p className="text-sm uppercase tracking-[0.2em] text-white/40">
+                Security
+              </p>
+
+              <h2 className="mt-1 text-2xl font-semibold">
+                Recent Admin Activity
               </h2>
 
               <p className="mt-1 text-sm text-white/45">
-                {filteredUsers.length} user
-                {filteredUsers.length !== 1 ? "s" : ""} shown
+                A record of administrative actions performed on user accounts.
               </p>
             </div>
 
+            <button
+              onClick={fetchAuditLogs}
+              disabled={auditLoading}
+              className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-white/70 transition hover:bg-white/[0.08] disabled:opacity-50"
+            >
+              {auditLoading ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+            {auditLogs.length === 0 ? (
+              <div className="p-10 text-center">
+                <p className="text-white/50">
+                  No admin activity recorded yet.
+                </p>
+
+                <p className="mt-2 text-sm text-white/30">
+                  Suspend or unsuspend a user to create the first audit log.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-white/[0.06]">
+                {auditLogs.map((log) => (
+                  <div
+                    key={log._id}
+                    className="flex flex-col gap-4 p-5 transition hover:bg-white/[0.025] md:flex-row md:items-center md:justify-between"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg ${
+                          log.action === "SUSPEND_USER"
+                            ? "bg-red-500/15"
+                            : "bg-emerald-500/15"
+                        }`}
+                      >
+                        {log.action === "SUSPEND_USER" ? "🚫" : "✓"}
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-white">
+                          {log.action === "SUSPEND_USER"
+                            ? "User Suspended"
+                            : "User Unsuspended"}
+                        </p>
+
+                        <p className="mt-1 text-sm text-white/50">
+                          Admin{" "}
+                          <span className="text-white/75">
+                            @{log.admin?.username || "Unknown"}
+                          </span>{" "}
+                          performed this action on{" "}
+                          <span className="text-white/75">
+                            @{log.targetUser?.username || "Deleted User"}
+                          </span>
+                        </p>
+
+                        {log.details && (
+                          <p className="mt-1 text-xs text-white/30">
+                            {log.details}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="shrink-0 text-xs text-white/35">
+                      {formatDate(log.createdAt)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* USER MANAGEMENT */}
+
+        <section>
+          <div className="mb-5 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-white/40">
+                Management
+              </p>
+
+              <h2 className="mt-1 text-2xl font-semibold">
+                User Management
+              </h2>
+            </div>
+
             <input
-              type="text"
-              placeholder="Search users..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25 md:w-72"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search users..."
+              className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25 md:w-72"
             />
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-left">
-              <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-white/35">
+          <div className="overflow-x-auto rounded-3xl border border-white/10 bg-white/[0.03]">
+            <table className="w-full min-w-[850px] text-left">
+              <thead className="border-b border-white/[0.08] bg-white/[0.025] text-sm text-white/45">
                 <tr>
                   <th className="px-6 py-4 font-medium">
                     User
@@ -435,8 +614,7 @@ export default function AdminPage() {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 font-semibold">
-                          {user.fullName?.charAt(0)?.toUpperCase() ||
-                            "U"}
+                          {user.fullName?.charAt(0)?.toUpperCase() || "U"}
                         </div>
 
                         <div>
@@ -479,9 +657,7 @@ export default function AdminPage() {
                             : "bg-emerald-500/15 text-emerald-300"
                         }`}
                       >
-                        {user.isSuspended
-                          ? "Suspended"
-                          : "Active"}
+                        {user.isSuspended ? "Suspended" : "Active"}
                       </span>
                     </td>
 
