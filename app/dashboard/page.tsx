@@ -6,7 +6,16 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../../services/api";
 
-const cards = [
+interface Card {
+  title: string;
+  description: string;
+  icon: string;
+  href: string;
+  gradient: string;
+  adminOnly?: boolean;
+}
+
+const cards: Card[] = [
   {
     title: "Find Match",
     description:
@@ -53,6 +62,15 @@ const cards = [
     href: "/tea-spots",
     gradient: "from-amber-500 to-orange-600",
   },
+  {
+    title: "Admin Dashboard",
+    description:
+      "Manage users, monitor activity and control CampusConnect.",
+    icon: "🛡️",
+    href: "/admin",
+    gradient: "from-violet-500 to-purple-700",
+    adminOnly: true,
+  },
 ];
 
 interface User {
@@ -62,6 +80,7 @@ interface User {
   department?: string;
   year?: string;
   profileImage?: string;
+  role?: "user" | "admin";
 }
 
 interface DashboardData {
@@ -89,8 +108,7 @@ const defaultStats = [
 ];
 
 export default function Dashboard() {
-  const [user, setUser] =
-    useState<User>({});
+  const [user, setUser] = useState<User>({});
 
   const [dashboard, setDashboard] =
     useState<DashboardData>({
@@ -118,9 +136,9 @@ export default function Dashboard() {
 
         if (storedUser) {
           try {
-            setUser(
-              JSON.parse(storedUser)
-            );
+            const parsedUser = JSON.parse(storedUser);
+
+            setUser(parsedUser);
           } catch {
             setUser({});
           }
@@ -162,7 +180,6 @@ export default function Dashboard() {
           friends:
             Number(res.data.friends) || 0,
         });
-
       } catch (error) {
         console.error(
           "DASHBOARD LOAD ERROR:",
@@ -175,6 +192,18 @@ export default function Dashboard() {
 
     loadDashboard();
   }, []);
+
+  // ==========================================
+  // FILTER CARDS
+  // ==========================================
+
+  const visibleCards = cards.filter((card) => {
+    if (card.adminOnly) {
+      return user.role === "admin";
+    }
+
+    return true;
+  });
 
   // ==========================================
   // LIVE STATS
@@ -242,8 +271,6 @@ export default function Dashboard() {
 
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-6">
 
-          {/* Logo */}
-
           <Link
             href="/dashboard"
             className="flex items-center gap-3"
@@ -274,7 +301,14 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-2 sm:gap-3">
 
-            
+            {user.role === "admin" && (
+              <Link
+                href="/admin"
+                className="rounded-xl border border-purple-400/30 bg-purple-500/15 px-4 py-2 text-sm font-medium text-purple-300 transition hover:bg-purple-500/25 hover:text-purple-200"
+              >
+                🛡️ Admin
+              </Link>
+            )}
 
             <Link
               href="/profile"
@@ -295,9 +329,7 @@ export default function Dashboard() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 py-10 sm:px-6 md:py-14">
 
-        {/* ========================================= */}
         {/* WELCOME */}
-        {/* ========================================= */}
 
         <motion.section
           initial={{
@@ -323,8 +355,7 @@ export default function Dashboard() {
             Welcome back,{" "}
 
             <span className="bg-gradient-to-r from-blue-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-              {user.fullName ||
-                "Student"}
+              {user.fullName || "Student"}
             </span>
 
             {" "}👋
@@ -332,17 +363,14 @@ export default function Dashboard() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
-            Your campus is full of people you
-            haven't met yet. Find someone,
-            start a conversation, and see where
+            Your campus is full of people you haven't met yet.
+            Find someone, start a conversation, and see where
             the connection goes.
           </p>
 
         </motion.section>
 
-        {/* ========================================= */}
         {/* MAIN CONNECTION CTA */}
-        {/* ========================================= */}
 
         <motion.section
           initial={{
@@ -377,17 +405,13 @@ export default function Dashboard() {
               </div>
 
               <h2 className="text-3xl font-bold sm:text-4xl">
-                Someone out there is
-                waiting to meet you.
+                Someone out there is waiting to meet you.
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
-                Choose what kind of connection
-                you're looking for and we'll find
-                a compatible student for you.
+                Choose what kind of connection you're looking for
+                and we'll find a compatible student for you.
               </p>
-
-              <div className="mt-6 flex flex-wrap gap-2"></div>
 
             </div>
 
@@ -410,9 +434,7 @@ export default function Dashboard() {
 
         </motion.section>
 
-        {/* ========================================= */}
         {/* QUICK ACTIONS */}
-        {/* ========================================= */}
 
         <section>
 
@@ -433,15 +455,14 @@ export default function Dashboard() {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Everything you need to connect
-              with your campus.
+              Everything you need to connect with your campus.
             </p>
 
           </motion.div>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
 
-            {cards.map(
+            {visibleCards.map(
               (card, index) => (
 
                 <motion.div
@@ -455,9 +476,7 @@ export default function Dashboard() {
                     y: 0,
                   }}
                   transition={{
-                    delay:
-                      0.3 +
-                      index * 0.1,
+                    delay: 0.3 + index * 0.1,
                     duration: 0.6,
                   }}
                 >
@@ -504,9 +523,7 @@ export default function Dashboard() {
 
         </section>
 
-        {/* ========================================= */}
         {/* CONNECTION STATS */}
-        {/* ========================================= */}
 
         <motion.section
           initial={{
@@ -531,8 +548,7 @@ export default function Dashboard() {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Your CampusConnect activity
-              at a glance.
+              Your CampusConnect activity at a glance.
             </p>
 
           </div>
@@ -588,9 +604,7 @@ export default function Dashboard() {
 
         </motion.section>
 
-        {/* ========================================= */}
         {/* HOW IT WORKS */}
-        {/* ========================================= */}
 
         <motion.section
           initial={{
@@ -615,8 +629,7 @@ export default function Dashboard() {
             </h2>
 
             <p className="mt-1 text-sm text-slate-500">
-              Meeting someone new is just three
-              steps away.
+              Meeting someone new is just three steps away.
             </p>
 
           </div>
@@ -634,9 +647,8 @@ export default function Dashboard() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Decide whether you're looking
-                for friendship, study partners,
-                coffee chats, dating, or simply
+                Decide whether you're looking for friendship,
+                study partners, coffee chats, dating, or simply
                 someone new to meet.
               </p>
 
@@ -653,9 +665,8 @@ export default function Dashboard() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                CampusConnect finds a compatible
-                student who is looking for the
-                same kind of connection.
+                CampusConnect finds a compatible student who is
+                looking for the same kind of connection.
               </p>
 
             </div>
@@ -671,9 +682,8 @@ export default function Dashboard() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Start with an anonymous chat.
-                Get comfortable first, then
-                reveal your identity when you're
+                Start with an anonymous chat. Get comfortable
+                first, then reveal your identity when you're
                 both ready.
               </p>
 
@@ -685,13 +695,10 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ========================================= */}
       {/* FOOTER */}
-      {/* ========================================= */}
 
       <footer className="relative z-10 border-t border-white/5 py-8 text-center text-xs text-slate-600">
-        CampusConnect · Connecting Campus.
-        Creating Connections.
+        CampusConnect · Connecting Campus. Creating Connections.
       </footer>
 
     </main>
