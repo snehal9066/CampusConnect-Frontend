@@ -11,7 +11,6 @@ interface ProfileForm {
   bio: string;
   age: string;
   gender: string;
-  interestedIn: string;
   location: string;
   interests: string;
 }
@@ -22,7 +21,6 @@ export default function ProfilePage() {
     bio: "",
     age: "",
     gender: "Male",
-    interestedIn: "Everyone",
     location: "",
     interests: "",
   });
@@ -84,17 +82,11 @@ export default function ProfilePage() {
           gender:
             profile.gender || "Male",
 
-          interestedIn:
-            profile.interestedIn ||
-            "Everyone",
-
           location:
             profile.location || "",
 
           interests:
-            Array.isArray(
-              profile.interests
-            )
+            Array.isArray(profile.interests)
               ? profile.interests.join(", ")
               : "",
         });
@@ -120,15 +112,14 @@ export default function ProfilePage() {
 
   const handleChange = (
     e: React.ChangeEvent<
-      HTMLInputElement |
-        HTMLTextAreaElement |
-        HTMLSelectElement
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
     >
   ) => {
     setForm({
       ...form,
-      [e.target.name]:
-        e.target.value,
+      [e.target.name]: e.target.value,
     });
 
     setMessage("");
@@ -152,8 +143,7 @@ export default function ProfilePage() {
       setError("");
       setMessage("");
 
-      const formData =
-        new FormData();
+      const formData = new FormData();
 
       formData.append(
         "username",
@@ -177,19 +167,15 @@ export default function ProfilePage() {
       );
 
       const newProfileImage =
-        res.data.user?.profileImage ||
-        "";
+        res.data.user?.profileImage || "";
 
       setProfileImage(
         newProfileImage
       );
 
-      const storedUser =
-        JSON.parse(
-          localStorage.getItem(
-            "user"
-          ) || "{}"
-        );
+      const storedUser = JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
 
       localStorage.setItem(
         "user",
@@ -236,25 +222,24 @@ export default function ProfilePage() {
         setError(
           "Please login again."
         );
-
         return;
       }
 
       const res = await axios.put(
         `${API_URL}/api/profile/update`,
         {
-          username: form.username,
+          username:
+            form.username,
 
-          bio: form.bio,
+          bio:
+            form.bio,
 
           age: form.age
             ? Number(form.age)
             : null,
 
-          gender: form.gender,
-
-          interestedIn:
-            form.interestedIn,
+          gender:
+            form.gender,
 
           location:
             form.location,
@@ -280,9 +265,7 @@ export default function ProfilePage() {
 
       localStorage.setItem(
         "user",
-        JSON.stringify(
-          updatedUser
-        )
+        JSON.stringify(updatedUser)
       );
 
       setProfileImage(
@@ -292,38 +275,28 @@ export default function ProfilePage() {
 
       setForm({
         username:
-          updatedUser.username ||
-          "",
+          updatedUser.username || "",
 
         bio:
           updatedUser.bio || "",
 
         age:
           updatedUser.age
-            ? String(
-                updatedUser.age
-              )
+            ? String(updatedUser.age)
             : "",
 
         gender:
           updatedUser.gender ||
           "Male",
 
-        interestedIn:
-          updatedUser.interestedIn ||
-          "Everyone",
-
         location:
-          updatedUser.location ||
-          "",
+          updatedUser.location || "",
 
         interests:
           Array.isArray(
             updatedUser.interests
           )
-            ? updatedUser.interests.join(
-                ", "
-              )
+            ? updatedUser.interests.join(", ")
             : "",
       });
 
@@ -405,7 +378,9 @@ export default function ProfilePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
 
+      {/* ====================================== */}
       {/* BACKGROUND */}
+      {/* ====================================== */}
 
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
 
@@ -435,9 +410,13 @@ export default function ProfilePage() {
           className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-600/15 blur-[140px]"
         />
 
+        <div className="absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-pink-500/[0.04] blur-[150px]" />
+
       </div>
 
+      {/* ====================================== */}
       {/* NAVBAR */}
+      {/* ====================================== */}
 
       <nav className="relative z-20 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
 
@@ -453,7 +432,6 @@ export default function ProfilePage() {
             </div>
 
             <div>
-
               <h1 className="text-lg font-bold">
                 Campus
                 <span className="text-purple-400">
@@ -464,7 +442,6 @@ export default function ProfilePage() {
               <p className="text-[10px] text-slate-500">
                 Connecting Campus
               </p>
-
             </div>
 
           </Link>
@@ -480,7 +457,9 @@ export default function ProfilePage() {
 
       </nav>
 
-      {/* MAIN */}
+      {/* ====================================== */}
+      {/* MAIN CONTENT */}
+      {/* ====================================== */}
 
       <div className="relative z-10 mx-auto max-w-5xl px-5 py-10 sm:px-6">
 
@@ -519,7 +498,7 @@ export default function ProfilePage() {
               </div>
             )}
 
-            <h1 className="mt-5 text-center text-4xl font-bold">
+            <h1 className="mt-5 text-center text-4xl font-bold text-white">
               {form.username ||
                 "Your Profile"}
             </h1>
@@ -530,70 +509,18 @@ export default function ProfilePage() {
 
           </div>
 
-          {/* STATS */}
-
-          <div className="grid gap-3 p-6 sm:grid-cols-3 sm:p-10">
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-
-              <div className="text-2xl">
-                ❤️
-              </div>
-
-              <p className="mt-2 text-2xl font-bold">
-                0
-              </p>
-
-              <p className="text-xs text-slate-500">
-                Connections
-              </p>
-
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-
-              <div className="text-2xl">
-                💬
-              </div>
-
-              <p className="mt-2 text-2xl font-bold">
-                0
-              </p>
-
-              <p className="text-xs text-slate-500">
-                Chats
-              </p>
-
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center">
-
-              <div className="text-2xl">
-                👥
-              </div>
-
-              <p className="mt-2 text-2xl font-bold">
-                0
-              </p>
-
-              <p className="text-xs text-slate-500">
-                Friends
-              </p>
-
-            </div>
-
-          </div>
-
+          {/* ====================================== */}
           {/* FORM */}
+          {/* ====================================== */}
 
           <form
             onSubmit={handleSave}
-            className="px-6 pb-8 sm:px-10"
+            className="px-6 pb-8 pt-10 sm:px-10"
           >
 
             {/* PERSONAL INFORMATION */}
 
-            <div className="border-t border-white/10 pt-8">
+            <div>
 
               <p className="text-xs font-semibold uppercase tracking-wider text-purple-300">
                 Personal Information
@@ -639,41 +566,12 @@ export default function ProfilePage() {
                     min="13"
                     max="100"
                     value={form.age}
-                    onChange={handleChange}
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Your age"
-                    className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
                   />
-
-                </div>
-
-                {/* GENDER */}
-
-                <div className="md:col-span-2">
-
-                  <label className="mb-2 block text-sm font-semibold">
-                    🚻 Gender
-                  </label>
-
-                  <select
-                    name="gender"
-                    value={form.gender}
-                    onChange={handleChange}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-800 p-4 text-sm text-white outline-none focus:border-purple-400/40"
-                  >
-
-                    <option value="Male">
-                      Male
-                    </option>
-
-                    <option value="Female">
-                      Female
-                    </option>
-
-                    <option value="Other">
-                      Other
-                    </option>
-
-                  </select>
 
                 </div>
 
@@ -690,154 +588,85 @@ export default function ProfilePage() {
                 <textarea
                   name="bio"
                   value={form.bio}
-                  onChange={handleChange}
+                  onChange={
+                    handleChange
+                  }
                   rows={4}
                   placeholder="Tell other students a little about yourself..."
-                  className="w-full resize-none rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40"
+                  className="w-full resize-none rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
                 />
 
               </div>
 
-              {/* LOCATION */}
+              {/* GENDER + LOCATION */}
 
-              <div className="mt-5">
+              <div className="mt-5 grid gap-5 md:grid-cols-2">
 
-                <label className="mb-2 block text-sm font-semibold">
-                  📍 Location
-                </label>
-
-                <input
-                  type="text"
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                  placeholder="Where are you from?"
-                  className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40"
-                />
-
-              </div>
-
-            </div>
-
-            {/* ANONYMOUS CHAT PREFERENCES */}
-
-            <div className="mt-10 rounded-3xl border border-purple-400/20 bg-gradient-to-br from-purple-500/[0.10] to-pink-500/[0.06] p-6 sm:p-8">
-
-              <div className="flex items-start gap-4">
-
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-purple-500/20 text-2xl">
-                  💬
-                </div>
+                {/* GENDER */}
 
                 <div>
 
-                  <p className="text-xs font-semibold uppercase tracking-wider text-purple-300">
-                    Anonymous Chat
-                  </p>
+                  <label className="mb-2 block text-sm font-semibold">
+                    🚻 Gender
+                  </label>
 
-                  <h2 className="mt-1 text-2xl font-bold">
-                    Chat Preferences
-                  </h2>
+                  <select
+                    name="gender"
+                    value={
+                      form.gender
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    className="w-full rounded-2xl border border-white/10 bg-slate-800 p-4 text-sm text-white outline-none focus:border-purple-400/40"
+                  >
+                    <option value="Male">
+                      Male
+                    </option>
 
-                  <p className="mt-2 text-sm leading-6 text-slate-400">
-                    Choose who you would prefer to
-                    connect with when starting an
-                    anonymous chat.
-                  </p>
+                    <option value="Female">
+                      Female
+                    </option>
 
-                </div>
-
-              </div>
-
-              <div className="mt-7">
-
-                <label className="mb-3 block text-sm font-semibold">
-                  💗 Who would you like to talk to?
-                </label>
-
-                <div className="grid gap-3 sm:grid-cols-3">
-
-                  {[
-                    {
-                      value: "Male",
-                      icon: "👨",
-                      label: "Male",
-                    },
-                    {
-                      value: "Female",
-                      icon: "👩",
-                      label: "Female",
-                    },
-                    {
-                      value: "Everyone",
-                      icon: "👥",
-                      label: "Everyone",
-                    },
-                  ].map((option) => {
-
-                    const selected =
-                      form.interestedIn ===
-                      option.value;
-
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          setForm({
-                            ...form,
-                            interestedIn:
-                              option.value,
-                          });
-
-                          setMessage("");
-                          setError("");
-                        }}
-                        className={`relative rounded-2xl border p-5 text-center transition ${
-                          selected
-                            ? "border-purple-400 bg-purple-500/20 text-white shadow-lg shadow-purple-900/20"
-                            : "border-white/10 bg-white/[0.035] text-slate-300 hover:bg-white/[0.07]"
-                        }`}
-                      >
-
-                        {selected && (
-                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-purple-500 text-xs">
-                            ✓
-                          </span>
-                        )}
-
-                        <div className="text-3xl">
-                          {option.icon}
-                        </div>
-
-                        <p className="mt-3 text-sm font-semibold">
-                          {option.label}
-                        </p>
-
-                      </button>
-                    );
-                  })}
+                    <option value="Other">
+                      Other
+                    </option>
+                  </select>
 
                 </div>
 
-              </div>
+                {/* LOCATION */}
 
-              <div className="mt-6 rounded-2xl border border-purple-400/10 bg-purple-500/[0.06] p-4">
+                <div>
 
-                <p className="text-xs leading-5 text-slate-400">
-                  🔒 Your identity remains anonymous
-                  when you start a conversation.
-                  You can simply choose your preferred
-                  connection and start chatting.
-                </p>
+                  <label className="mb-2 block text-sm font-semibold">
+                    📍 Location
+                  </label>
+
+                  <input
+                    type="text"
+                    name="location"
+                    value={
+                      form.location
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Where are you from?"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
+                  />
+
+                </div>
 
               </div>
 
             </div>
 
+            {/* ====================================== */}
             {/* INTERESTS */}
+            {/* ====================================== */}
 
-            <div className="mt-10">
+            <div className="mt-8">
 
               <label className="mb-2 block text-sm font-semibold">
                 🎯 Your Interests
@@ -846,14 +675,17 @@ export default function ProfilePage() {
               <input
                 type="text"
                 name="interests"
-                value={form.interests}
-                onChange={handleChange}
+                value={
+                  form.interests
+                }
+                onChange={
+                  handleChange
+                }
                 placeholder="Coding, AI, Music, Cricket..."
-                className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40"
+                className="w-full rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-white outline-none placeholder:text-slate-500 focus:border-purple-400/40 focus:ring-2 focus:ring-purple-500/10"
               />
 
               {interestTags.length > 0 && (
-
                 <div className="mt-4 flex flex-wrap gap-2">
 
                   {interestTags.map(
@@ -861,19 +693,16 @@ export default function ProfilePage() {
                       interest,
                       index
                     ) => (
-
                       <span
                         key={`${interest}-${index}`}
                         className="rounded-full border border-purple-400/20 bg-purple-500/10 px-3 py-1.5 text-xs text-purple-300"
                       >
                         {interest}
                       </span>
-
                     )
                   )}
 
                 </div>
-
               )}
 
               <p className="mt-2 text-xs text-slate-600">
@@ -882,7 +711,9 @@ export default function ProfilePage() {
 
             </div>
 
+            {/* ====================================== */}
             {/* PROFILE IMAGE */}
+            {/* ====================================== */}
 
             <div className="mt-10 border-t border-white/10 pt-8">
 
@@ -960,7 +791,9 @@ export default function ProfilePage() {
 
                     <button
                       type="button"
-                      onClick={handleUploadImage}
+                      onClick={
+                        handleUploadImage
+                      }
                       disabled={
                         uploading ||
                         !image
@@ -983,7 +816,6 @@ export default function ProfilePage() {
             {/* STATUS */}
 
             {message && (
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -997,11 +829,9 @@ export default function ProfilePage() {
               >
                 ✓ {message}
               </motion.div>
-
             )}
 
             {error && (
-
               <motion.div
                 initial={{
                   opacity: 0,
@@ -1015,7 +845,6 @@ export default function ProfilePage() {
               >
                 ⚠️ {error}
               </motion.div>
-
             )}
 
             {/* BUTTONS */}
@@ -1043,7 +872,9 @@ export default function ProfilePage() {
 
           </form>
 
+          {/* ====================================== */}
           {/* ACCOUNT */}
+          {/* ====================================== */}
 
           <div className="border-t border-white/10 px-6 py-8 sm:px-10">
 
@@ -1077,6 +908,8 @@ export default function ProfilePage() {
         </motion.div>
 
       </div>
+
+      {/* FOOTER */}
 
       <footer className="relative z-10 py-8 text-center text-xs text-slate-600">
         CampusConnect · Connecting Campus.
