@@ -19,7 +19,7 @@ const cards: Card[] = [
   {
     title: "Find Match",
     description:
-      "Discover students looking for the same kind of connection.",
+      "Start an anonymous chat and connect with another student.",
     icon: "💜",
     href: "/match",
     gradient: "from-pink-500 to-purple-600",
@@ -27,15 +27,23 @@ const cards: Card[] = [
   {
     title: "Chats",
     description:
-      "Continue your conversations and connect with your matches.",
+      "Continue your anonymous conversations and connections.",
     icon: "💬",
     href: "/chat",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
+    title: "Friends & Connections",
+    description:
+      "View the people you've connected with and continue chatting.",
+    icon: "🤝",
+    href: "/friends",
+    gradient: "from-violet-500 to-fuchsia-600",
+  },
+  {
     title: "Profile",
     description:
-      "Manage your campus identity and connection preferences.",
+      "Manage your campus identity and profile information.",
     icon: "👤",
     href: "/profile",
     gradient: "from-purple-500 to-indigo-600",
@@ -50,14 +58,16 @@ const cards: Card[] = [
   },
   {
     title: "Dating",
-    description: "Find romantic connections on campus.",
+    description:
+      "Find romantic connections on campus.",
     icon: "❤️",
     href: "/dating",
     gradient: "from-rose-500 to-pink-600",
   },
   {
     title: "Tea Spots",
-    description: "Explore coffee and tea spots to chat.",
+    description:
+      "Explore coffee and tea spots to chat.",
     icon: "☕",
     href: "/tea-spots",
     gradient: "from-amber-500 to-orange-600",
@@ -127,26 +137,19 @@ export default function Dashboard() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        // --------------------------------------
-        // Load local user
-        // --------------------------------------
-
         const storedUser =
           localStorage.getItem("user");
 
         if (storedUser) {
           try {
-            const parsedUser = JSON.parse(storedUser);
+            const parsedUser =
+              JSON.parse(storedUser);
 
             setUser(parsedUser);
           } catch {
             setUser({});
           }
         }
-
-        // --------------------------------------
-        // Get token
-        // --------------------------------------
 
         const token =
           localStorage.getItem("token");
@@ -155,10 +158,6 @@ export default function Dashboard() {
           setLoadingStats(false);
           return;
         }
-
-        // --------------------------------------
-        // Get dashboard data
-        // --------------------------------------
 
         const res = await axios.get(
           `${API_URL}/api/dashboard`,
@@ -297,8 +296,6 @@ export default function Dashboard() {
 
           </Link>
 
-          {/* Navigation */}
-
           <div className="flex items-center gap-2 sm:gap-3">
 
             {user.role === "admin" && (
@@ -364,8 +361,8 @@ export default function Dashboard() {
 
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-400 sm:text-lg">
             Your campus is full of people you haven't met yet.
-            Find someone, start a conversation, and see where
-            the connection goes.
+            Start an anonymous conversation, get to know someone,
+            and decide when you're ready to reveal your identity.
           </p>
 
         </motion.section>
@@ -409,8 +406,8 @@ export default function Dashboard() {
               </h2>
 
               <p className="mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
-                Choose what kind of connection you're looking for
-                and we'll find a compatible student for you.
+                Choose who you'd like to connect with and we'll find
+                a compatible student for an anonymous conversation.
               </p>
 
             </div>
@@ -643,13 +640,13 @@ export default function Dashboard() {
               </div>
 
               <h3 className="mt-5 font-bold">
-                Choose your connection
+                Choose your preference
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Decide whether you're looking for friendship,
-                study partners, coffee chats, dating, or simply
-                someone new to meet.
+                Choose who you would like to connect with.
+                Your preference helps us find a compatible
+                student for an anonymous conversation.
               </p>
 
             </div>
@@ -665,8 +662,9 @@ export default function Dashboard() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                CampusConnect finds a compatible student who is
-                looking for the same kind of connection.
+                CampusConnect finds another available student
+                whose connection preference is compatible
+                with yours.
               </p>
 
             </div>
@@ -682,9 +680,9 @@ export default function Dashboard() {
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Start with an anonymous chat. Get comfortable
-                first, then reveal your identity when you're
-                both ready.
+                Start anonymously and get comfortable first.
+                Reveal your identity only when both of you
+                are ready.
               </p>
 
             </div>
